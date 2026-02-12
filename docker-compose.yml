@@ -1,0 +1,60 @@
+version: '3.8'
+
+services:
+  # MySQL Database
+  mysql:
+    image: mysql:8.0
+    container_name: finfreelance_mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_DATABASE: finfreelance
+      MYSQL_USER: finfreelance_user
+      MYSQL_PASSWORD: finfreelance_pass
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
+    command: --default-authentication-plugin=mysql_native_password
+    networks:
+      - finfreelance_network
+
+  # phpMyAdmin per gestione DB (opzionale)
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: finfreelance_phpmyadmin
+    restart: unless-stopped
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: finfreelance_user
+      PMA_PASSWORD: finfreelance_pass
+    ports:
+      - "8080:80"
+    depends_on:
+      - mysql
+    networks:
+      - finfreelance_network
+
+  # Redis per caching e sessioni (opzionale ma consigliato)
+  redis:
+    image: redis:7-alpine
+    container_name: finfreelance_redis
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - finfreelance_network
+
+volumes:
+  mysql_data:
+    driver: local
+  redis_data:
+    driver: local
+
+networks:
+  finfreelance_network:
+    driver: bridge
