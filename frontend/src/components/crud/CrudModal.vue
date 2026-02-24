@@ -4,7 +4,8 @@ import { ref, watch } from 'vue'
 export interface FieldDef {
   key: string
   label: string
-  type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select'
+  type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'divider'
+  col?: 1 | 2
   required?: boolean
   options?: { value: string | number; label: string }[]
   placeholder?: string
@@ -38,6 +39,10 @@ watch(
 function handleSubmit() {
   emit('save', { ...form.value })
 }
+
+function colClass(field: FieldDef) {
+  return field.col === 1 ? 'col-span-1' : 'col-span-2'
+}
 </script>
 
 <template>
@@ -52,7 +57,7 @@ function handleSubmit() {
         <div class="absolute inset-0 bg-black/40" />
 
         <!-- Panel -->
-        <div class="relative bg-white rounded-xl shadow-xl w-full max-w-lg max-h-[90vh] flex flex-col">
+        <div class="modal-panel relative bg-white rounded-xl shadow-xl w-full max-w-xl max-h-[90vh] flex flex-col">
           <!-- Header -->
           <div class="flex items-center justify-between px-6 py-4 border-b border-gray-200">
             <h2 class="text-lg font-semibold text-gray-900">{{ title }}</h2>
@@ -67,46 +72,57 @@ function handleSubmit() {
           </div>
 
           <!-- Body -->
-          <form id="crud-form" @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            <div v-for="field in fields" :key="field.key">
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                {{ field.label }}
-                <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
-              </label>
+          <form id="crud-form" @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto px-6 py-4">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-4">
+              <template v-for="field in fields">
+                <!-- Divider / section header -->
+                <div v-if="field.type === 'divider'" :key="`divider-${field.key}`" class="col-span-2 flex items-center gap-3 pt-1">
+                  <span class="text-xs font-semibold uppercase tracking-wider text-gray-400">{{ field.label }}</span>
+                  <div class="flex-1 h-px bg-gray-100" />
+                </div>
 
-              <textarea
-                v-if="field.type === 'textarea'"
-                v-model="form[field.key]"
-                :placeholder="field.placeholder"
-                :required="field.required"
-                rows="3"
-                class="input resize-none"
-              />
+                <!-- Regular fields -->
+                <div v-else :key="field.key" :class="colClass(field)">
+                  <label class="block text-sm font-medium text-gray-700 mb-1">
+                    {{ field.label }}
+                    <span v-if="field.required" class="text-red-500 ml-0.5">*</span>
+                  </label>
 
-              <select
-                v-else-if="field.type === 'select'"
-                v-model="form[field.key]"
-                :required="field.required"
-                class="input"
-              >
-                <option value="" disabled>Seleziona...</option>
-                <option
-                  v-for="opt in field.options"
-                  :key="opt.value"
-                  :value="opt.value"
-                >
-                  {{ opt.label }}
-                </option>
-              </select>
+                  <textarea
+                    v-if="field.type === 'textarea'"
+                    v-model="form[field.key]"
+                    :placeholder="field.placeholder"
+                    :required="field.required"
+                    rows="3"
+                    class="input resize-none"
+                  />
 
-              <input
-                v-else
-                v-model="form[field.key]"
-                :type="field.type"
-                :placeholder="field.placeholder"
-                :required="field.required"
-                class="input"
-              />
+                  <select
+                    v-else-if="field.type === 'select'"
+                    v-model="form[field.key]"
+                    :required="field.required"
+                    class="input"
+                  >
+                    <option value="" disabled>Seleziona...</option>
+                    <option
+                      v-for="opt in field.options"
+                      :key="opt.value"
+                      :value="opt.value"
+                    >
+                      {{ opt.label }}
+                    </option>
+                  </select>
+
+                  <input
+                    v-else
+                    v-model="form[field.key]"
+                    :type="field.type"
+                    :placeholder="field.placeholder"
+                    :required="field.required"
+                    class="input"
+                  />
+                </div>
+              </template>
             </div>
           </form>
 
@@ -136,8 +152,17 @@ function handleSubmit() {
 .modal-leave-active {
   transition: opacity 0.15s ease;
 }
+.modal-enter-active .modal-panel,
+.modal-leave-active .modal-panel {
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
+}
+.modal-enter-from .modal-panel,
+.modal-leave-to .modal-panel {
+  opacity: 0;
+  transform: translateY(8px);
 }
 </style>

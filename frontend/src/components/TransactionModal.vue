@@ -116,121 +116,121 @@ const isEditing = computed(() => !!props.initialData)
           </div>
 
           <!-- Body -->
-          <form id="transaction-form" @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto px-6 py-4 space-y-4">
-            <!-- Type toggle -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-2">Tipo <span class="text-red-500">*</span></label>
-              <div class="grid grid-cols-2 gap-3">
-                <button
-                  type="button"
-                  @click="form.type = 'income'"
-                  :class="[
-                    'flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all border-2',
-                    form.type === 'income'
-                      ? 'bg-green-50 border-green-500 text-green-700'
-                      : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
-                  ]"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
-                  </svg>
-                  Entrata
-                </button>
-                <button
-                  type="button"
-                  @click="form.type = 'expense'"
-                  :class="[
-                    'flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all border-2',
-                    form.type === 'expense'
-                      ? 'bg-red-50 border-red-500 text-red-700'
-                      : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
-                  ]"
-                >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
-                  </svg>
-                  Uscita
-                </button>
-              </div>
-            </div>
+          <form id="transaction-form" @submit.prevent="handleSubmit" class="flex-1 overflow-y-auto px-6 py-4">
+            <div class="grid grid-cols-2 gap-x-4 gap-y-4">
 
-            <!-- Amount -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                Importo <span class="text-red-500">*</span>
-              </label>
-              <div class="relative">
-                <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">EUR</span>
+              <!-- Type toggle (full width) -->
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-2">Tipo <span class="text-red-500">*</span></label>
+                <div class="grid grid-cols-2 gap-3">
+                  <button
+                    type="button"
+                    @click="form.type = 'income'"
+                    :class="[
+                      'flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all border-2',
+                      form.type === 'income'
+                        ? 'bg-green-50 border-green-500 text-green-700'
+                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
+                    ]"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 11l5-5m0 0l5 5m-5-5v12" />
+                    </svg>
+                    Entrata
+                  </button>
+                  <button
+                    type="button"
+                    @click="form.type = 'expense'"
+                    :class="[
+                      'flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-medium transition-all border-2',
+                      form.type === 'expense'
+                        ? 'bg-red-50 border-red-500 text-red-700'
+                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-300'
+                    ]"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 13l-5 5m0 0l-5-5m5 5V6" />
+                    </svg>
+                    Uscita
+                  </button>
+                </div>
+              </div>
+
+              <!-- Amount + Date (same row) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Importo <span class="text-red-500">*</span>
+                </label>
+                <div class="relative">
+                  <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm font-medium">EUR</span>
+                  <input
+                    v-model.number="form.amount"
+                    type="number"
+                    step="0.01"
+                    min="0.01"
+                    required
+                    placeholder="0.00"
+                    class="input pl-12"
+                  />
+                </div>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Data <span class="text-red-500">*</span>
+                </label>
                 <input
-                  v-model.number="form.amount"
-                  type="number"
-                  step="0.01"
-                  min="0.01"
+                  v-model="form.date"
+                  type="date"
                   required
-                  placeholder="0.00"
-                  class="input pl-12"
+                  class="input"
                 />
               </div>
-            </div>
 
-            <!-- Description -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                Descrizione <span class="text-red-500">*</span>
-              </label>
-              <input
-                v-model="form.description"
-                type="text"
-                required
-                placeholder="Es. Consulenza progetto web"
-                class="input"
-              />
-            </div>
+              <!-- Description (full width) -->
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Descrizione <span class="text-red-500">*</span>
+                </label>
+                <input
+                  v-model="form.description"
+                  type="text"
+                  required
+                  placeholder="Es. Consulenza progetto web"
+                  class="input"
+                />
+              </div>
 
-            <!-- Date -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">
-                Data <span class="text-red-500">*</span>
-              </label>
-              <input
-                v-model="form.date"
-                type="date"
-                required
-                class="input"
-              />
-            </div>
+              <!-- Client + Category (same row) -->
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
+                <select v-model="form.clientId" class="input">
+                  <option value="">Nessun cliente</option>
+                  <option v-for="client in clients" :key="client.id" :value="client.id">
+                    {{ client.name }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
+                <select v-model="form.categoryId" class="input">
+                  <option value="">Nessuna categoria</option>
+                  <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">
+                    {{ cat.name }}
+                  </option>
+                </select>
+              </div>
 
-            <!-- Client -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Cliente</label>
-              <select v-model="form.clientId" class="input">
-                <option value="">Nessun cliente</option>
-                <option v-for="client in clients" :key="client.id" :value="client.id">
-                  {{ client.name }}
-                </option>
-              </select>
-            </div>
+              <!-- Invoice number (full width) -->
+              <div class="col-span-2">
+                <label class="block text-sm font-medium text-gray-700 mb-1">Numero fattura</label>
+                <input
+                  v-model="form.invoiceNumber"
+                  type="text"
+                  placeholder="Es. FT-2024-001"
+                  class="input"
+                />
+              </div>
 
-            <!-- Category -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-              <select v-model="form.categoryId" class="input">
-                <option value="">Nessuna categoria</option>
-                <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">
-                  {{ cat.name }}
-                </option>
-              </select>
-            </div>
-
-            <!-- Invoice number -->
-            <div>
-              <label class="block text-sm font-medium text-gray-700 mb-1">Numero fattura</label>
-              <input
-                v-model="form.invoiceNumber"
-                type="text"
-                placeholder="Es. FT-2024-001"
-                class="input"
-              />
             </div>
           </form>
 

@@ -47,21 +47,29 @@ const columns: Column[] = [
 
 const fields: FieldDef[] = [
   { key: 'name',       label: 'Nome',           type: 'text',     required: true, placeholder: 'Es. Mario Rossi Srl' },
-  { key: 'status',     label: 'Stato',           type: 'select',   required: true,
+  { key: 'status',     label: 'Stato',           type: 'select',   required: true, col: 1,
     options: [
       { value: 'lead',     label: 'Lead' },
       { value: 'active',   label: 'Attivo' },
       { value: 'archived', label: 'Archiviato' },
     ],
   },
-  { key: 'email',      label: 'Email',           type: 'email',    placeholder: 'email@esempio.it' },
-  { key: 'phone',      label: 'Telefono',        type: 'text',     placeholder: '+39 333 1234567' },
-  { key: 'vatNumber',  label: 'Partita IVA',     type: 'text',     placeholder: 'IT12345678901' },
-  { key: 'fiscalCode', label: 'Codice Fiscale',  type: 'text' },
-  { key: 'address',    label: 'Indirizzo',       type: 'text' },
-  { key: 'city',       label: 'Città',           type: 'text' },
-  { key: 'postalCode', label: 'CAP',             type: 'text' },
+
+  { key: '_contatti',  label: 'Contatti',        type: 'divider' },
+  { key: 'email',      label: 'Email',           type: 'email',    col: 1, placeholder: 'email@esempio.it' },
+  { key: 'phone',      label: 'Telefono',        type: 'text',     col: 1, placeholder: '+39 333 1234567' },
+
+  { key: '_fiscale',   label: 'Dati fiscali',    type: 'divider' },
+  { key: 'vatNumber',  label: 'Partita IVA',     type: 'text',     col: 1, placeholder: 'IT12345678901' },
+  { key: 'fiscalCode', label: 'Codice Fiscale',  type: 'text',     col: 1 },
+
+  { key: '_indirizzo', label: 'Indirizzo',       type: 'divider' },
+  { key: 'address',    label: 'Via / Indirizzo', type: 'text' },
+  { key: 'city',       label: 'Città',           type: 'text',     col: 1 },
+  { key: 'postalCode', label: 'CAP',             type: 'text',     col: 1 },
   { key: 'country',    label: 'Paese',           type: 'text',     placeholder: 'Italia' },
+
+  { key: '_note',      label: 'Note',            type: 'divider' },
   { key: 'notes',      label: 'Note',            type: 'textarea' },
 ]
 
