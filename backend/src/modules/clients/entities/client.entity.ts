@@ -8,6 +8,12 @@ import {
   JoinColumn,
 } from 'typeorm';
 
+export enum ClientStatus {
+  LEAD = 'lead',
+  ACTIVE = 'active',
+  ARCHIVED = 'archived',
+}
+
 @Entity('clients')
 export class Client {
   @PrimaryGeneratedColumn('uuid')
@@ -42,6 +48,9 @@ export class Client {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @Column({ type: 'enum', enum: ClientStatus, default: ClientStatus.ACTIVE })
+  status: ClientStatus;
 
   @ManyToOne('User', (user: any) => user.clients, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })

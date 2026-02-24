@@ -7,14 +7,14 @@ Questo file contiene le funzionalità da implementare per completare l'applicazi
 ### Backend
 
 - [ ] **Completare CRUD Transactions**
-  - [ ] Create endpoint (POST /transactions)
-  - [ ] Update endpoint (PATCH /transactions/:id)
-  - [ ] Delete endpoint (DELETE /transactions/:id)
+  - [+] Create endpoint (POST /transactions)
+  - [+] Update endpoint (PATCH /transactions/:id)
+  - [+] Delete endpoint (DELETE /transactions/:id)
   - [ ] Filtri avanzati (per data, tipo, categoria, cliente)
   - [ ] Paginazione
 
 - [ ] **Completare CRUD Categories**
-  - [ ] Tutti gli endpoint CRUD
+  - [+] Tutti gli endpoint CRUD
   - [ ] Categorie custom per utente
 
 - [ ] **Completare CRUD Clients**

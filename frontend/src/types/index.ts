@@ -48,6 +48,8 @@ export interface Category {
   isDefault: boolean
 }
 
+export type ClientStatus = 'lead' | 'active' | 'archived'
+
 export interface Client {
   id: string
   name: string
@@ -60,6 +62,7 @@ export interface Client {
   postalCode?: string
   country?: string
   notes?: string
+  status: ClientStatus
   userId: string
 }
 

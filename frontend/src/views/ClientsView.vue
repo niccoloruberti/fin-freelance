@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import CrudTable, { type Column } from '@/components/crud/CrudTable.vue'
 import CrudModal, { type FieldDef } from '@/components/crud/CrudModal.vue'
 import api from '@/services/api'
-import type { Client } from '@/types'
+import type { Client, ClientStatus } from '@/types'
 
 const items = ref<Client[]>([])
 const loading = ref(false)
@@ -11,26 +11,58 @@ const saving = ref(false)
 const modalOpen = ref(false)
 const editingItem = ref<Client | null>(null)
 const error = ref<string | null>(null)
+const activeFilter = ref<ClientStatus | 'all'>('all')
+
+const STATUS_CONFIG: Record<ClientStatus, { label: string; classes: string }> = {
+  lead:     { label: 'Lead',     classes: 'bg-yellow-100 text-yellow-800' },
+  active:   { label: 'Attivo',   classes: 'bg-green-100 text-green-800' },
+  archived: { label: 'Archiviato', classes: 'bg-gray-100 text-gray-600' },
+}
+
+function statusConfig(value: string) {
+  return STATUS_CONFIG[value as ClientStatus]
+}
+
+const FILTER_TABS: { value: ClientStatus | 'all'; label: string }[] = [
+  { value: 'all',      label: 'Tutti' },
+  { value: 'lead',     label: 'Lead' },
+  { value: 'active',   label: 'Attivi' },
+  { value: 'archived', label: 'Archiviati' },
+]
+
+const filteredItems = computed(() =>
+  activeFilter.value === 'all'
+    ? items.value
+    : items.value.filter((c) => c.status === activeFilter.value),
+)
 
 const columns: Column[] = [
-  { key: 'name', label: 'Nome' },
-  { key: 'email', label: 'Email' },
-  { key: 'phone', label: 'Telefono' },
+  { key: 'name',      label: 'Nome' },
+  { key: 'email',     label: 'Email' },
+  { key: 'phone',     label: 'Telefono' },
   { key: 'vatNumber', label: 'P.IVA' },
-  { key: 'city', label: 'Città' },
+  { key: 'city',      label: 'Città' },
+  { key: 'status',    label: 'Stato' },
 ]
 
 const fields: FieldDef[] = [
-  { key: 'name', label: 'Nome', type: 'text', required: true, placeholder: 'Es. Mario Rossi Srl' },
-  { key: 'email', label: 'Email', type: 'email', placeholder: 'email@esempio.it' },
-  { key: 'phone', label: 'Telefono', type: 'text', placeholder: '+39 333 1234567' },
-  { key: 'vatNumber', label: 'Partita IVA', type: 'text', placeholder: 'IT12345678901' },
-  { key: 'fiscalCode', label: 'Codice Fiscale', type: 'text' },
-  { key: 'address', label: 'Indirizzo', type: 'text' },
-  { key: 'city', label: 'Città', type: 'text' },
-  { key: 'postalCode', label: 'CAP', type: 'text' },
-  { key: 'country', label: 'Paese', type: 'text', placeholder: 'Italia' },
-  { key: 'notes', label: 'Note', type: 'textarea' },
+  { key: 'name',       label: 'Nome',           type: 'text',     required: true, placeholder: 'Es. Mario Rossi Srl' },
+  { key: 'status',     label: 'Stato',           type: 'select',   required: true,
+    options: [
+      { value: 'lead',     label: 'Lead' },
+      { value: 'active',   label: 'Attivo' },
+      { value: 'archived', label: 'Archiviato' },
+    ],
+  },
+  { key: 'email',      label: 'Email',           type: 'email',    placeholder: 'email@esempio.it' },
+  { key: 'phone',      label: 'Telefono',        type: 'text',     placeholder: '+39 333 1234567' },
+  { key: 'vatNumber',  label: 'Partita IVA',     type: 'text',     placeholder: 'IT12345678901' },
+  { key: 'fiscalCode', label: 'Codice Fiscale',  type: 'text' },
+  { key: 'address',    label: 'Indirizzo',       type: 'text' },
+  { key: 'city',       label: 'Città',           type: 'text' },
+  { key: 'postalCode', label: 'CAP',             type: 'text' },
+  { key: 'country',    label: 'Paese',           type: 'text',     placeholder: 'Italia' },
+  { key: 'notes',      label: 'Note',            type: 'textarea' },
 ]
 
 async function fetchItems() {
@@ -104,15 +136,42 @@ onMounted(fetchItems)
       {{ error }}
     </div>
 
+    <!-- Filtri per stato -->
+    <div class="flex gap-1 mb-4">
+      <button
+        v-for="tab in FILTER_TABS"
+        :key="tab.value"
+        @click="activeFilter = tab.value"
+        class="px-3 py-1.5 text-sm rounded-md font-medium transition-colors"
+        :class="activeFilter === tab.value
+          ? 'bg-primary-600 text-white'
+          : 'bg-white text-gray-600 border border-gray-200 hover:bg-gray-50'"
+      >
+        {{ tab.label }}
+        <span class="ml-1 text-xs opacity-70">
+          {{ tab.value === 'all' ? items.length : items.filter(c => c.status === tab.value).length }}
+        </span>
+      </button>
+    </div>
+
     <div class="card p-0 overflow-hidden">
       <CrudTable
         :columns="columns"
-        :items="items"
+        :items="filteredItems"
         :loading="loading"
-        empty-message="Nessun cliente ancora. Creane uno!"
+        empty-message="Nessun cliente trovato."
         @edit="openEdit"
         @delete="handleDelete"
-      />
+      >
+        <template #cell-status="{ value }">
+          <span
+            class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium"
+            :class="statusConfig(value)?.classes"
+          >
+            {{ statusConfig(value)?.label ?? value }}
+          </span>
+        </template>
+      </CrudTable>
     </div>
 
     <CrudModal

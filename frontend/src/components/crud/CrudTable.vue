@@ -62,7 +62,9 @@ function getCellValue(item: Record<string, any>, col: Column): string {
             :key="col.key"
             class="px-4 py-3 text-sm text-gray-700"
           >
-            {{ getCellValue(item, col) }}
+            <slot :name="`cell-${col.key}`" :value="item[col.key]" :row="item">
+              {{ getCellValue(item, col) }}
+            </slot>
           </td>
           <td class="px-4 py-3 text-right">
             <div class="flex justify-end gap-2">
