@@ -7,18 +7,18 @@ Questo file contiene le funzionalità da implementare per completare l'applicazi
 ### Backend
 
 - [ ] **Completare CRUD Transactions**
-  - [+] Create endpoint (POST /transactions)
-  - [+] Update endpoint (PATCH /transactions/:id)
-  - [+] Delete endpoint (DELETE /transactions/:id)
+  - [x] Create endpoint (POST /transactions)
+  - [x] Update endpoint (PATCH /transactions/:id)
+  - [x] Delete endpoint (DELETE /transactions/:id)
   - [ ] Filtri avanzati (per data, tipo, categoria, cliente)
   - [ ] Paginazione
 
 - [ ] **Completare CRUD Categories**
-  - [+] Tutti gli endpoint CRUD
-  - [ ] Categorie custom per utente
+  - [x] Tutti gli endpoint CRUD (GET, POST, PUT, DELETE)
+  - [ ] Categorie custom per utente (attualmente le categorie sono globali)
 
 - [ ] **Completare CRUD Clients**
-  - [ ] Tutti gli endpoint CRUD
+  - [x] Tutti gli endpoint CRUD (GET, POST, PATCH, DELETE)
   - [ ] Ricerca clienti
 
 - [ ] **Tax Calculator Service**
@@ -62,9 +62,9 @@ Questo file contiene le funzionalità da implementare per completare l'applicazi
   - [ ] Azioni bulk (selezione multipla)
 
 - [ ] **Gestione Clienti**
-  - [ ] Lista clienti
-  - [ ] Form anagrafica completa
-  - [ ] Dettaglio cliente con storico
+  - [x] Lista clienti
+  - [x] Form anagrafica completa (CRUD modal)
+  - [ ] Dettaglio cliente con storico transazioni
   - [ ] Ricerca e filtri
 
 - [ ] **Riassunto Fiscale**
@@ -84,6 +84,41 @@ Questo file contiene le funzionalità da implementare per completare l'applicazi
 ## 🎯 Priorità Media
 
 ### Features Aggiuntive
+
+- [ ] **Generazione Ricevute/Fatture**
+  - [ ] Template ricevuta/fattura in PDF (logo, dati freelancer, dati cliente, importo, IVA/ritenuta)
+  - [ ] Backend: endpoint POST /invoices/generate → restituisce PDF
+  - [ ] Libreria suggerita: `@nestjs/pdf` con Puppeteer o `pdfmake`
+  - [ ] Numerazione automatica progressiva per anno
+  - [ ] Collegamento ricevuta → transazione (1:1)
+  - [ ] Frontend: pulsante "Genera ricevuta" dal dettaglio transazione
+  - [ ] Download PDF e/o invio via email al cliente
+  - [ ] Storico ricevute emesse per cliente
+
+- [ ] **Calendario Scadenze & Appuntamenti**
+  - [ ] Vista calendario integrata (mensile/settimanale) nel frontend
+  - [ ] Libreria suggerita: `FullCalendar` con vue3 adapter
+  - [ ] Backend: entity `events` (title, date, type, relatedTransactionId?)
+  - [ ] Tipi evento: scadenza fiscale, pagamento atteso, appuntamento cliente
+  - [ ] **Integrazione Google Calendar** (OAuth2 + Google Calendar API)
+    - [ ] Flusso OAuth2 per connettere account Google dell'utente
+    - [ ] Sync bidirezionale: eventi app → Google Calendar e viceversa
+    - [ ] Webhook per aggiornamenti in tempo reale
+  - [ ] **Integrazione iCloud Calendar** (CalDAV)
+  - [ ] **Integrazione Outlook/Microsoft Calendar** (Microsoft Graph API)
+  - [ ] Export ICS (standard universale, compatibile con tutti i calendari)
+  - [ ] Notifiche/reminder per scadenze imminenti
+
+- [ ] **Conformità GDPR**
+  - [ ] **Diritto all'oblio**: endpoint DELETE /users/me che cancella account + tutti i dati correlati (già cascade sul DB, da esporre)
+  - [ ] **Portabilità dati**: endpoint GET /users/me/export → ZIP con JSON di transazioni, clienti, categorie
+  - [ ] **Privacy policy** da mostrare al primo accesso (accettazione esplicita con timestamp)
+  - [ ] Registrazione consenso in DB (campo `gdprAcceptedAt` su `users`)
+  - [ ] **DPA (Data Processing Agreement)** da accettare per utenti business
+  - [ ] Log degli accessi ai dati sensibili (codice fiscale, P.IVA clienti)
+  - [ ] Configurazione data retention (es. auto-cancellazione dati dopo X anni)
+  - [ ] Indicare nella documentazione la geolocalizzazione dei server (server UE obbligatorio o SCCs)
+  - [ ] Cookie banner se si usano analytics
 
 - [ ] **Import/Export**
   - [ ] Import CSV transazioni
