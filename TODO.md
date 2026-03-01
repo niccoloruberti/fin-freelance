@@ -1,87 +1,122 @@
 # FinFreelance - TODO List
 
-Questo file contiene le funzionalità da implementare per completare l'applicazione.
+> Aggiornato al 2026-03-01 dopo analisi completa del codice.
 
-## 🔥 Priorità Alta
+## Stato reale del progetto
 
-### Backend
+| Modulo | Backend | Frontend | Pronto? |
+|---|---|---|---|
+| Auth (login) | ✅ | ✅ | ✅ |
+| Auth (register) | ✅ | ❌ skeleton | ⚠️ |
+| Users | ✅ | — | ✅ |
+| Transactions CRUD | ✅ | ✅ | ✅ |
+| Categories CRUD | ✅ | ✅ | ✅ |
+| Clients CRUD | ✅ | ✅ | ✅ |
+| Tax Summary | ✅ | ✅ | ✅ |
+| Settings | ✅ | ✅ | ✅ |
+| Dashboard | ❌ skeleton | ⚠️ shell grafica | ❌ |
+| Recurring | ❌ skeleton | ❌ assente | ❌ |
 
-- [ ] **Completare CRUD Transactions**
-  - [x] Create endpoint (POST /transactions)
-  - [x] Update endpoint (PATCH /transactions/:id)
-  - [x] Delete endpoint (DELETE /transactions/:id)
-  - [ ] Filtri avanzati (per data, tipo, categoria, cliente)
-  - [ ] Paginazione
+---
 
-- [ ] **Completare CRUD Categories**
-  - [x] Tutti gli endpoint CRUD (GET, POST, PUT, DELETE)
-  - [ ] Categorie custom per utente (attualmente le categorie sono globali)
+## 🔥 Priorità 1 — Blockers per il primo deploy
 
-- [ ] **Completare CRUD Clients**
-  - [x] Tutti gli endpoint CRUD (GET, POST, PATCH, DELETE)
-  - [ ] Ricerca clienti
+### [BE] Dashboard backend
+Il `dashboard.module.ts` esiste ma è vuoto. Mancano service e controller.
+- [ ] Aggiungere provider/controller in `dashboard.module.ts`
+- [ ] Creare `dashboard.service.ts` con `getSummary(userId, year)`:
+  - Totale entrate e uscite anno corrente
+  - Tasse stimate (delegare a TaxService)
+  - Ultime 5 transazioni (con relazioni categoria e cliente)
+  - Breakdown mensile entrate/uscite (12 mesi, per il grafico)
+- [ ] Creare `dashboard.controller.ts`: `GET /dashboard/summary?year=YYYY`
 
-- [ ] **Tax Calculator Service**
-  - [ ] Calcolo automatico tasse regime forfettario
-  - [ ] Calcolo tasse regime ordinario
-  - [ ] Endpoint GET /tax/summary/:year
-  - [ ] Previsioni fiscali
+### [FE] RegisterView
+Completamente vuota. Senza registrazione nessun utente può creare un account.
+- [ ] Implementare `frontend/src/views/auth/RegisterView.vue`
+  - Campi: firstName, lastName, email, password, conferma password
+  - Validazione con vee-validate + yup (stesso pattern di LoginView)
+  - Chiamata `authStore.register(data)` (già implementata nello store)
+  - Redirect a /dashboard dopo successo
+  - Gestione errori (es. email già registrata → 409)
 
-- [ ] **Dashboard Analytics**
-  - [ ] Endpoint GET /dashboard/stats
-  - [ ] Aggregazioni per periodo
-  - [ ] Statistiche clienti
-  - [ ] Grafici andamento
+### [FE] Dashboard frontend
+La `DashboardView.vue` ha 4 KPI cards hardcoded a 0 e nessuna logica.
+- [ ] Fetch `GET /dashboard/summary` all'`onMounted`
+- [ ] Collegare KPI cards (Fatturato, Spese, Tasse Stimate, Utile Netto)
+- [ ] Popolare tabella "Ultime Transazioni"
+- [ ] Collegare grafico "Andamento Mensile" (riusare il pattern da `TaxSummaryView.vue`)
+- [ ] Loading skeleton mentre carica
 
-- [ ] **Recurring Transactions**
-  - [ ] Entity per ricorrenze
-  - [ ] Cron job per creazione automatica
-  - [ ] Gestione ricorrenze (mensili, trimestrali, annuali)
+---
 
-### Frontend
+## 🎯 Priorità Alta (già avanzata — riepilogo stato)
 
-- [ ] **Completare Registrazione**
-  - [ ] Form completo
-  - [ ] Validazione
-  - [ ] Gestione errori
+### Backend ✅
 
-- [ ] **Dashboard Completa**
-  - [ ] Integrazione API
-  - [ ] Grafici interattivi (Chart.js)
-  - [ ] Widget configurabili
-  - [ ] Export dati
+- [x] **CRUD Transactions** — tutti gli endpoint (GET, POST, PATCH, DELETE), scoped per user
+- [x] **CRUD Categories** — tutti gli endpoint (GET, POST, PUT, DELETE)
+- [x] **CRUD Clients** — tutti gli endpoint (GET, POST, PATCH, DELETE), scoped per user
+- [x] **Tax Calculator Service** — calcolo automatico regime forfettario, endpoint `GET /tax/summary?year=YYYY`, contributi INPS (3 gestioni), acconti giugno/novembre
+- [ ] **Dashboard Analytics** — vedi Priorità 1
+- [ ] **Recurring Transactions** — vedi Priorità 4
 
-- [ ] **Gestione Transazioni**
-  - [ ] Lista con tabella
-  - [ ] Form creazione/modifica
-  - [ ] Modal dettaglio
-  - [ ] Filtri avanzati
-  - [ ] Ricerca
-  - [ ] Ordinamento colonne
-  - [ ] Paginazione
-  - [ ] Azioni bulk (selezione multipla)
+### Frontend ✅
 
-- [ ] **Gestione Clienti**
-  - [x] Lista clienti
-  - [x] Form anagrafica completa (CRUD modal)
-  - [ ] Dettaglio cliente con storico transazioni
-  - [ ] Ricerca e filtri
+- [x] **Gestione Transazioni** — lista, form creazione/modifica, CRUD completo
+- [x] **Gestione Clienti** — lista, form anagrafica completa (CRUD modal)
+- [x] **Gestione Categorie** — lista, CRUD completo
+- [x] **Riassunto Fiscale** — vista annuale, dettaglio calcoli, acconti, grafico mensile, year selector
+- [x] **Impostazioni** — profilo utente, configurazione fiscale (coefficienti, aliquote, gestione INPS)
+- [ ] **Registrazione** — vedi Priorità 1
+- [ ] **Dashboard Completa** — vedi Priorità 1
 
-- [ ] **Riassunto Fiscale**
-  - [ ] Vista annuale
-  - [ ] Dettaglio calcoli
-  - [ ] Simulatore ("Cosa succederebbe se...")
-  - [ ] Export PDF per commercialista
-  - [ ] Timeline scadenze fiscali
+---
 
-- [ ] **Impostazioni**
-  - [ ] Profilo utente
-  - [ ] Configurazione fiscale (coefficienti, aliquote)
-  - [ ] Preferenze app
-  - [ ] Gestione password
-  - [ ] Backup/Export dati
+## 🔧 Priorità 2 — Qualità e consistenza
 
-## 🎯 Priorità Media
+- [ ] **Uniformare HTTP methods (PUT → PATCH)**
+  - `backend/src/modules/categories/categories.controller.ts`: `@Put` → `@Patch`
+  - `frontend/src/views/CategoriesView.vue`: chiamata update da `PUT` a `PATCH`
+  - `frontend/src/views/ClientsView.vue`: chiamata update da `PUT` a `PATCH`
+
+- [ ] **Filtri Transactions**
+  - Filtro per tipo (entrata/uscita), periodo (mese/anno), categoria
+  - Ricerca per descrizione
+
+- [ ] **Categorie custom per utente**
+  - Attualmente le categorie sono globali (non associate a un utente)
+  - Decidere se mantenere le default globali e aggiungere custom per-user
+
+---
+
+## 🚀 Priorità 3 — Deploy
+
+- [ ] Scegliere hosting (Railway per semplicità, o Hetzner VPS €4/mese)
+- [ ] Adattare `docker-compose.yml` per produzione (rimuovere phpMyAdmin, aggiungere Nginx/Caddy)
+- [ ] `Dockerfile` per backend e build statica frontend
+- [ ] Variabili d'ambiente di produzione
+- [ ] SSL con Let's Encrypt o Caddy (automatico)
+- [ ] Dominio
+- [ ] Rate limiting su route di auth (`@nestjs/throttler`)
+- [ ] `CORS_ORIGIN` ristretto al dominio di produzione
+- [ ] Disabilitare Swagger in produzione
+
+---
+
+## 💡 Priorità 4 — Features post-deploy
+
+- [ ] **Recurring Transactions** — entity, CRUD backend, cron job (`@nestjs/schedule`), frontend view
+- [ ] **Paginazione e ordinamento** — lista transazioni, clienti
+- [ ] **Export dati** — CSV transazioni, PDF riepilogo tasse per commercialista
+- [ ] **Dettaglio cliente** — vista con storico transazioni associate
+- [ ] **Password reset** — flusso email con token
+- [ ] **Riassunto Fiscale — Simulatore** — previsione "cosa succederebbe se guadagnassi X in più"
+- [ ] **Timeline scadenze fiscali** — acconto giugno, acconto novembre, saldo marzo
+
+---
+
+## 🎯 Priorità Media (originale — medium-term)
 
 ### Features Aggiuntive
 
@@ -174,10 +209,8 @@ Questo file contiene le funzionalità da implementare per completare l'applicazi
 - [ ] Loading states consistenti
 - [ ] Validazione form avanzata
 - [ ] Ottimizzazione performance
-- [ ] SEO optimization
 - [ ] Accessibility (WCAG)
-- [ ] Error boundaries React
-- [ ] Rate limiting API
+- [ ] Rate limiting API (vedi Priorità 3 - deploy)
 - [ ] Input sanitization
 - [ ] SQL injection prevention (già coperto da TypeORM)
 
@@ -224,6 +257,4 @@ Questo file contiene le funzionalità da implementare per completare l'applicazi
 
 ---
 
-**Note**: Questa lista è in continua evoluzione. Sentiti libero di aggiungere, rimuovere o riorganizzare le priorità in base alle tue esigenze!
-
-Per contribuire, scegli un task, crea un branch, implementa, testa e apri una PR.
+**Note**: Le priorità 1–3 sono necessarie per un primo deploy utilizzabile da un amico. Le priorità 4+ sono iterazioni successive.

@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, In } from 'typeorm';
 import { Category } from './entities/category.entity';
@@ -38,18 +38,12 @@ export class CategoriesService {
 
   async update(id: string, dto: UpdateCategoryDto): Promise<Category> {
     const category = await this.findOne(id);
-    if (category.isDefault) {
-      throw new ForbiddenException('Le categorie di sistema non possono essere modificate');
-    }
     Object.assign(category, dto);
     return this.categoriesRepository.save(category);
   }
 
   async remove(id: string): Promise<void> {
     const category = await this.findOne(id);
-    if (category.isDefault) {
-      throw new ForbiddenException('Le categorie di sistema non possono essere eliminate');
-    }
     await this.categoriesRepository.remove(category);
   }
 }

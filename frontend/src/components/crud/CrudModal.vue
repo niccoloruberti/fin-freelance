@@ -4,11 +4,13 @@ import { ref, watch } from 'vue'
 export interface FieldDef {
   key: string
   label: string
-  type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'divider'
+  type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'divider' | 'color' | 'emoji'
   col?: 1 | 2
   required?: boolean
   options?: { value: string | number; label: string }[]
   placeholder?: string
+  palette?: string[]
+  emojiList?: string[]
 }
 
 const props = defineProps<{
@@ -41,6 +43,7 @@ function handleSubmit() {
 }
 
 function colClass(field: FieldDef) {
+  if (field.type === 'color' || field.type === 'emoji') return 'col-span-2'
   return field.col === 1 ? 'col-span-1' : 'col-span-2'
 }
 </script>
@@ -112,6 +115,52 @@ function colClass(field: FieldDef) {
                       {{ opt.label }}
                     </option>
                   </select>
+
+                  <!-- Color palette picker -->
+                  <div v-else-if="field.type === 'color'" class="mt-1">
+                    <div class="flex flex-wrap gap-2">
+                      <button
+                        v-for="color in field.palette"
+                        :key="color"
+                        type="button"
+                        :style="{ backgroundColor: color }"
+                        :class="[
+                          'w-8 h-8 rounded-full border-2 transition-all',
+                          form[field.key] === color
+                            ? 'border-gray-800 scale-110 shadow-md'
+                            : 'border-transparent hover:border-gray-400',
+                        ]"
+                        @click="form[field.key] = color"
+                      />
+                    </div>
+                    <p v-if="form[field.key]" class="text-xs text-gray-400 mt-2 flex items-center gap-1.5">
+                      <span :style="{ backgroundColor: form[field.key] }" class="inline-block w-3 h-3 rounded-full" />
+                      {{ form[field.key] }}
+                    </p>
+                  </div>
+
+                  <!-- Emoji picker -->
+                  <div v-else-if="field.type === 'emoji'" class="mt-1">
+                    <div class="flex flex-wrap gap-1 max-h-36 overflow-y-auto p-1.5 rounded-lg border border-gray-200 bg-gray-50">
+                      <button
+                        v-for="emoji in field.emojiList"
+                        :key="emoji"
+                        type="button"
+                        :class="[
+                          'w-9 h-9 flex items-center justify-center rounded-lg text-lg transition-all',
+                          form[field.key] === emoji
+                            ? 'bg-primary-100 ring-2 ring-primary-500'
+                            : 'hover:bg-white hover:shadow-sm',
+                        ]"
+                        @click="form[field.key] = emoji"
+                      >
+                        {{ emoji }}
+                      </button>
+                    </div>
+                    <p v-if="form[field.key]" class="text-xs text-gray-400 mt-1">
+                      Selezionato: {{ form[field.key] }}
+                    </p>
+                  </div>
 
                   <input
                     v-else

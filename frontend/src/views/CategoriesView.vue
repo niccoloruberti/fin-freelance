@@ -21,15 +21,24 @@ const columns: Column[] = [
   },
   { key: 'icon', label: 'Icona' },
   { key: 'color', label: 'Colore' },
-  {
-    key: 'isDefault',
-    label: 'Default',
-    format: (val: boolean) => (val ? 'Sì' : 'No'),
-  },
+]
+
+const EMOJI_LIST = [
+  '💪', '🦴', '📋', '📚', '💻', '🏋️', '🏢', '📖', '🛠️', '🚗',
+  '📣', '🛡️', '📦', '🎯', '🏃', '🧘', '⚡', '🌟', '💡', '🔧',
+  '📊', '💰', '🤝', '🎓', '🏅', '🩺', '🧪', '🏆', '🎽', '🔬',
+  '💊', '🥗', '🍎', '🧠', '⚖️', '🔑', '📱', '🎁', '🎨', '🚴',
+]
+
+const COLOR_PALETTE = [
+  '#EF4444', '#F97316', '#F59E0B', '#EAB308',
+  '#84CC16', '#22C55E', '#10B981', '#14B8A6',
+  '#06B6D4', '#0EA5E9', '#3B82F6', '#6366F1',
+  '#8B5CF6', '#A855F7', '#EC4899', '#6B7280',
 ]
 
 const fields: FieldDef[] = [
-  { key: 'name', label: 'Nome', type: 'text', required: true, placeholder: 'Es. Trasporti' },
+  { key: 'name', label: 'Nome', type: 'text', required: true, placeholder: 'Es. Sessione PT' },
   {
     key: 'type',
     label: 'Tipo',
@@ -41,8 +50,8 @@ const fields: FieldDef[] = [
       { value: 'both', label: 'Entrambi' },
     ],
   },
-  { key: 'icon', label: 'Icona', type: 'text', placeholder: 'Es. 🚗' },
-  { key: 'color', label: 'Colore', type: 'text', placeholder: 'Es. #FF5733' },
+  { key: 'icon', label: 'Icona', type: 'emoji', emojiList: EMOJI_LIST },
+  { key: 'color', label: 'Colore', type: 'color', palette: COLOR_PALETTE },
 ]
 
 async function fetchItems() {
@@ -124,7 +133,18 @@ onMounted(fetchItems)
         empty-message="Nessuna categoria ancora. Creane una!"
         @edit="openEdit"
         @delete="handleDelete"
-      />
+      >
+        <template #cell-icon="{ value }">
+          <span class="text-xl">{{ value ?? '—' }}</span>
+        </template>
+        <template #cell-color="{ value }">
+          <div v-if="value" class="flex items-center gap-2">
+            <div :style="{ backgroundColor: value }" class="w-4 h-4 rounded-full flex-shrink-0" />
+            <span class="text-xs text-gray-400 font-mono">{{ value }}</span>
+          </div>
+          <span v-else>—</span>
+        </template>
+      </CrudTable>
     </div>
 
     <CrudModal

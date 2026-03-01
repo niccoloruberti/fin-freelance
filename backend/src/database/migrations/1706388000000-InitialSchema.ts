@@ -109,19 +109,21 @@ export class InitialSchema1706388000000 implements MigrationInterface {
             ON DELETE SET NULL ON UPDATE NO ACTION
         `);
 
-        // Insert default categories
+        // Insert default categories (biomeccanico / personal trainer)
         await queryRunner.query(`
             INSERT INTO \`categories\` (\`id\`, \`name\`, \`type\`, \`icon\`, \`color\`, \`isDefault\`, \`createdAt\`, \`updatedAt\`) VALUES
-            (UUID(), 'Consulenza', 'income', '💼', '#10B981', 1, NOW(), NOW()),
-            (UUID(), 'Sviluppo Software', 'income', '💻', '#3B82F6', 1, NOW(), NOW()),
-            (UUID(), 'Formazione', 'income', '📚', '#8B5CF6', 1, NOW(), NOW()),
-            (UUID(), 'Design', 'income', '🎨', '#EC4899', 1, NOW(), NOW()),
-            (UUID(), 'Marketing', 'income', '📈', '#F59E0B', 1, NOW(), NOW()),
-            (UUID(), 'Software/Tools', 'expense', '🛠️', '#6B7280', 1, NOW(), NOW()),
-            (UUID(), 'Formazione', 'expense', '📖', '#8B5CF6', 1, NOW(), NOW()),
-            (UUID(), 'Ufficio', 'expense', '🏢', '#059669', 1, NOW(), NOW()),
-            (UUID(), 'Marketing', 'expense', '📣', '#F59E0B', 1, NOW(), NOW()),
+            (UUID(), 'Sessione Personal Training', 'income', '💪', '#10B981', 1, NOW(), NOW()),
+            (UUID(), 'Consulenza Biomeccanica', 'income', '🦴', '#3B82F6', 1, NOW(), NOW()),
+            (UUID(), 'Valutazione Posturale', 'income', '📋', '#8B5CF6', 1, NOW(), NOW()),
+            (UUID(), 'Corso/Workshop', 'income', '📚', '#F59E0B', 1, NOW(), NOW()),
+            (UUID(), 'Online Coaching', 'income', '💻', '#06B6D4', 1, NOW(), NOW()),
+            (UUID(), 'Attrezzatura Fitness', 'expense', '🏋️', '#6B7280', 1, NOW(), NOW()),
+            (UUID(), 'Affitto Spazio/Studio', 'expense', '🏢', '#059669', 1, NOW(), NOW()),
+            (UUID(), 'Formazione/Aggiornamento', 'expense', '📖', '#8B5CF6', 1, NOW(), NOW()),
+            (UUID(), 'Software/App', 'expense', '🛠️', '#6366F1', 1, NOW(), NOW()),
             (UUID(), 'Trasporti', 'expense', '🚗', '#EF4444', 1, NOW(), NOW()),
+            (UUID(), 'Marketing/Promozione', 'expense', '📣', '#F59E0B', 1, NOW(), NOW()),
+            (UUID(), 'Assicurazione Professionale', 'expense', '🛡️', '#0EA5E9', 1, NOW(), NOW()),
             (UUID(), 'Altro', 'both', '📦', '#6B7280', 1, NOW(), NOW())
         `);
     }
