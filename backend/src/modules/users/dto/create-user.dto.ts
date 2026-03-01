@@ -1,4 +1,4 @@
-import { IsEmail, IsString, IsOptional, IsEnum, IsDecimal, MinLength } from 'class-validator';
+import { IsEmail, IsString, IsOptional, IsEnum, IsNumber, MinLength } from 'class-validator';
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
 
 export class CreateUserDto {
@@ -36,11 +36,19 @@ export class CreateUserDto {
 
   @ApiPropertyOptional({ example: 78 })
   @IsOptional()
-  @IsDecimal()
+  @IsNumber()
   taxCoefficientIncome?: number;
 
   @ApiPropertyOptional({ example: 15 })
   @IsOptional()
-  @IsDecimal()
+  @IsNumber()
   taxRateSubstitutive?: number;
+
+  @ApiPropertyOptional({
+    example: 'gestione_separata',
+    enum: ['gestione_separata', 'cassa_professionale', 'artigiani_commercianti'],
+  })
+  @IsOptional()
+  @IsEnum(['gestione_separata', 'cassa_professionale', 'artigiani_commercianti'])
+  inpsManagement?: string;
 }

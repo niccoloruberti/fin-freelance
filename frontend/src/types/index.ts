@@ -8,6 +8,7 @@ export interface User {
   taxRegime: 'forfettario' | 'ordinario'
   taxCoefficientIncome: number
   taxRateSubstitutive: number
+  inpsManagement: 'gestione_separata' | 'cassa_professionale' | 'artigiani_commercianti'
   createdAt: string
   updatedAt: string
 }
@@ -74,4 +75,29 @@ export interface TaxSummary {
   netIncome: number
   totalExpenses: number
   totalTaxes: number
+}
+
+export interface MonthlyTaxData {
+  month: number
+  income: number
+  expenses: number
+}
+
+export interface TaxSummaryDetail {
+  year: number
+  totalIncome: number
+  totalExpenses: number
+  taxableIncome: number       // reddito lordo: fatturato × coefficiente
+  netTaxableIncome: number    // reddito netto: taxableIncome − contributi INPS
+  taxCoefficientIncome: number
+  inpsContributions: number
+  inpsRate: number
+  substitutiveTax: number
+  taxRateSubstitutive: number
+  totalTax: number
+  netIncome: number
+  quarterlyReserve: number
+  taxRegime: string
+  inpsManagement: string
+  monthlyBreakdown: MonthlyTaxData[]
 }

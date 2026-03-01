@@ -15,12 +15,6 @@ const router = createRouter({
       meta: { requiresGuest: true }
     },
     {
-      path: '/register',
-      name: 'register',
-      component: () => import('@/views/auth/RegisterView.vue'),
-      meta: { requiresGuest: true }
-    },
-    {
       path: '/',
       component: () => import('@/layouts/AppLayout.vue'),
       meta: { requiresAuth: true },

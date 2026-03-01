@@ -45,6 +45,18 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
+  async function updateProfile(data: Partial<User>) {
+    if (!user.value) return false
+    try {
+      const response = await api.patch(`/users/${user.value.id}`, data)
+      user.value = response.data
+      return true
+    } catch (error) {
+      console.error('Update profile error:', error)
+      return false
+    }
+  }
+
   function logout() {
     user.value = null
     token.value = null
@@ -63,6 +75,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     fetchProfile,
+    updateProfile,
     logout
   }
 })

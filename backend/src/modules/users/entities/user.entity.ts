@@ -41,6 +41,13 @@ export class User {
   @Column({ type: 'decimal', precision: 5, scale: 2, default: 15 })
   taxRateSubstitutive: number; // Aliquota sostitutiva (es. 15%)
 
+  @Column({
+    type: 'enum',
+    enum: ['gestione_separata', 'cassa_professionale', 'artigiani_commercianti'],
+    default: 'gestione_separata',
+  })
+  inpsManagement: string; // Gestione previdenziale
+
   @Column({ default: true })
   isActive: boolean;
 
