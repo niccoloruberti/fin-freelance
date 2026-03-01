@@ -25,6 +25,9 @@ export interface TaxSummaryResult {
   totalTax: number;
   netIncome: number;
   quarterlyReserve: number;
+  junePayment: number;         // 1° acconto (40%) — scadenza 30 giugno
+  novemberPayment: number;     // 2° acconto (60%) — scadenza 30 novembre
+  accontiMethod: 'storico' | 'previsionale';
   taxRegime: string;
   inpsManagement: string;
   monthlyBreakdown: MonthlyData[];
@@ -42,11 +45,18 @@ export class TaxService {
   async getSummary(userId: string, year: number): Promise<TaxSummaryResult> {
     const user = await this.userRepository.findOne({ where: { id: userId } });
 
-    const transactions = await this.transactionRepository
-      .createQueryBuilder('t')
-      .where('t.userId = :userId', { userId })
-      .andWhere('YEAR(t.date) = :year', { year })
-      .getMany();
+    const [transactions, prevTransactions] = await Promise.all([
+      this.transactionRepository
+        .createQueryBuilder('t')
+        .where('t.userId = :userId', { userId })
+        .andWhere('YEAR(t.date) = :year', { year })
+        .getMany(),
+      this.transactionRepository
+        .createQueryBuilder('t')
+        .where('t.userId = :userId', { userId })
+        .andWhere('YEAR(t.date) = :year', { year: year - 1 })
+        .getMany(),
+    ]);
 
     const totalIncome = transactions
       .filter((t) => t.type === 'income')
@@ -59,44 +69,28 @@ export class TaxService {
     const taxCoefficientIncome = Number(user.taxCoefficientIncome);
     const taxRateSubstitutive = Number(user.taxRateSubstitutive);
 
-    // Reddito imponibile lordo (fatturato × coefficiente)
-    const taxableIncome = totalIncome * (taxCoefficientIncome / 100);
+    const { totalTax, taxableIncome, netTaxableIncome, substitutiveTax, inpsContributions, inpsRate } =
+      this.computeTax(totalIncome, user, year);
 
-    // Contributi INPS (calcolati sul reddito lordo, con aliquote dell'anno fiscale)
-    const inpsRates = getInpsRatesForYear(year);
-    let inpsContributions = 0;
-    let inpsRate = 0;
+    // Metodo storico: usa le tasse dell'anno precedente se disponibili
+    const prevIncome = prevTransactions
+      .filter((t) => t.type === 'income')
+      .reduce((sum, t) => sum + Number(t.amount), 0);
 
-    switch (user.inpsManagement) {
-      case 'gestione_separata': {
-        const { rate, ceiling } = inpsRates.gestione_separata;
-        inpsRate = rate;
-        const cappedIncome = Math.min(taxableIncome, ceiling);
-        inpsContributions = cappedIncome * inpsRate;
-        break;
-      }
-      case 'artigiani_commercianti': {
-        const { rate, minimum, minThreshold } = inpsRates.artigiani_commercianti;
-        inpsRate = rate;
-        if (taxableIncome <= minThreshold) {
-          inpsContributions = minimum;
-        } else {
-          inpsContributions = minimum + (taxableIncome - minThreshold) * inpsRate;
-        }
-        break;
-      }
-      case 'cassa_professionale': {
-        inpsRate = inpsRates.cassa_professionale.rate;
-        inpsContributions = taxableIncome * inpsRate;
-        break;
-      }
+    let accontiMethod: 'storico' | 'previsionale';
+    let accontiBase: number;
+
+    if (prevIncome > 0) {
+      accontiMethod = 'storico';
+      accontiBase = this.computeTax(prevIncome, user, year - 1).totalTax;
+    } else {
+      accontiMethod = 'previsionale';
+      accontiBase = totalTax;
     }
 
-    // Reddito netto imponibile: i contributi INPS versati si deducono dal lordo
-    // prima di applicare l'imposta sostitutiva (L. 190/2014, art. 1 c. 64)
-    const netTaxableIncome = Math.max(0, taxableIncome - inpsContributions);
-    const substitutiveTax = netTaxableIncome * (taxRateSubstitutive / 100);
-    const totalTax = substitutiveTax + inpsContributions;
+    const junePayment = accontiBase * 0.4;
+    const novemberPayment = accontiBase * 0.6;
+
     const netIncome = totalIncome - totalExpenses - totalTax;
     const quarterlyReserve = totalTax / 4;
 
@@ -129,9 +123,55 @@ export class TaxService {
       totalTax,
       netIncome,
       quarterlyReserve,
+      junePayment,
+      novemberPayment,
+      accontiMethod,
       taxRegime: user.taxRegime,
       inpsManagement: user.inpsManagement,
       monthlyBreakdown: Array.from(monthlyMap.values()),
     };
+  }
+
+  private computeTax(
+    totalIncome: number,
+    user: User,
+    year: number,
+  ): { totalTax: number; taxableIncome: number; netTaxableIncome: number; substitutiveTax: number; inpsContributions: number; inpsRate: number } {
+    const taxCoefficientIncome = Number(user.taxCoefficientIncome);
+    const taxRateSubstitutive = Number(user.taxRateSubstitutive);
+    const taxableIncome = totalIncome * (taxCoefficientIncome / 100);
+
+    const inpsRates = getInpsRatesForYear(year);
+    let inpsContributions = 0;
+    let inpsRate = 0;
+
+    switch (user.inpsManagement) {
+      case 'gestione_separata': {
+        const { rate, ceiling } = inpsRates.gestione_separata;
+        inpsRate = rate;
+        inpsContributions = Math.min(taxableIncome, ceiling) * inpsRate;
+        break;
+      }
+      case 'artigiani_commercianti': {
+        const { rate, minimum, minThreshold } = inpsRates.artigiani_commercianti;
+        inpsRate = rate;
+        inpsContributions =
+          taxableIncome <= minThreshold
+            ? minimum
+            : minimum + (taxableIncome - minThreshold) * inpsRate;
+        break;
+      }
+      case 'cassa_professionale': {
+        inpsRate = inpsRates.cassa_professionale.rate;
+        inpsContributions = taxableIncome * inpsRate;
+        break;
+      }
+    }
+
+    const netTaxableIncome = Math.max(0, taxableIncome - inpsContributions);
+    const substitutiveTax = netTaxableIncome * (taxRateSubstitutive / 100);
+    const totalTax = substitutiveTax + inpsContributions;
+
+    return { totalTax, taxableIncome, netTaxableIncome, substitutiveTax, inpsContributions, inpsRate };
   }
 }

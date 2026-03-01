@@ -97,6 +97,9 @@ export interface TaxSummaryDetail {
   totalTax: number
   netIncome: number
   quarterlyReserve: number
+  junePayment: number
+  novemberPayment: number
+  accontiMethod: 'storico' | 'previsionale'
   taxRegime: string
   inpsManagement: string
   monthlyBreakdown: MonthlyTaxData[]

@@ -251,23 +251,39 @@ onMounted(fetchSummary)
           </div>
         </div>
 
-        <!-- Accantonamento consigliato -->
+        <!-- Scadenze acconti -->
         <div class="space-y-4">
-          <div class="card bg-primary-50 border-primary-200">
-            <h3 class="text-sm font-semibold text-primary-900 mb-3">Accantonamento consigliato</h3>
-            <div class="space-y-3">
-              <div>
-                <p class="text-xs text-primary-700 font-medium uppercase tracking-wide">Per trimestre</p>
-                <p class="text-2xl font-bold text-primary-800 mt-0.5">{{ fmt(summary.quarterlyReserve) }}</p>
-              </div>
-              <div>
-                <p class="text-xs text-primary-700 font-medium uppercase tracking-wide">Per mese</p>
-                <p class="text-xl font-bold text-primary-800 mt-0.5">{{ fmt(summary.totalTax / 12) }}</p>
-              </div>
-              <p class="text-xs text-primary-600 mt-2">
-                Metti da parte questa cifra ogni periodo per essere pronto al versamento.
-              </p>
+          <!-- Badge metodo -->
+          <div class="flex items-center gap-2">
+            <span class="text-xs font-medium text-gray-500">Metodo di calcolo:</span>
+            <span
+              class="text-xs font-semibold px-2 py-0.5 rounded-full"
+              :class="summary.accontiMethod === 'storico'
+                ? 'bg-teal-100 text-teal-700'
+                : 'bg-amber-100 text-amber-700'"
+            >
+              {{ summary.accontiMethod === 'storico' ? 'Storico' : 'Previsionale' }}
+            </span>
+          </div>
+
+          <!-- 30 Giugno -->
+          <div class="card border-l-4 border-primary-400">
+            <div class="flex items-start justify-between mb-1">
+              <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">1° Acconto</p>
+              <span class="text-xs font-medium text-primary-600">30 Giugno {{ selectedYear }}</span>
             </div>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ fmt(summary.junePayment) }}</p>
+            <p class="text-xs text-gray-400 mt-1">40% dell'imponibile {{ summary.accontiMethod === 'storico' ? `anno ${selectedYear - 1}` : 'stimato' }}</p>
+          </div>
+
+          <!-- 30 Novembre -->
+          <div class="card border-l-4 border-orange-400">
+            <div class="flex items-start justify-between mb-1">
+              <p class="text-xs text-gray-500 uppercase tracking-wide font-medium">2° Acconto</p>
+              <span class="text-xs font-medium text-orange-600">30 Novembre {{ selectedYear }}</span>
+            </div>
+            <p class="text-2xl font-bold text-gray-900 mt-1">{{ fmt(summary.novemberPayment) }}</p>
+            <p class="text-xs text-gray-400 mt-1">60% dell'imponibile {{ summary.accontiMethod === 'storico' ? `anno ${selectedYear - 1}` : 'stimato' }}</p>
           </div>
 
           <div class="card">
