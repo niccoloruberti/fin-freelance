@@ -13,7 +13,6 @@ services:
     # Nessuna porta esposta all'host: accessibile solo dalla rete interna
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./backend/database/init.sql:/docker-entrypoint-initdb.d/init.sql
     command: --default-authentication-plugin=mysql_native_password
     networks:
       - finfreelance_network
