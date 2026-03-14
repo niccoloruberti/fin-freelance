@@ -33,6 +33,8 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
         synchronize: configService.get<boolean>('DB_SYNCHRONIZE', false),
         logging: configService.get<boolean>('DB_LOGGING', false),
         timezone: 'Z',
+        migrations: [__dirname + '/database/migrations/*{.ts,.js}'],
+        migrationsRun: configService.get('NODE_ENV') === 'production',
       }),
       inject: [ConfigService],
     }),
