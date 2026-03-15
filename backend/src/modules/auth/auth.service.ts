@@ -4,7 +4,6 @@ import * as bcrypt from 'bcrypt';
 import { UsersService } from '../users/users.service';
 import { User } from '../users/entities/user.entity';
 import { LoginDto } from './dto/login.dto';
-import { RegisterDto } from './dto/register.dto';
 
 @Injectable()
 export class AuthService {
@@ -32,22 +31,6 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
       user,
-    };
-  }
-
-  async register(registerDto: RegisterDto) {
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
-    if (existingUser) {
-      throw new UnauthorizedException('Email already exists');
-    }
-
-    const user = await this.usersService.create(registerDto);
-    const { password, ...result } = user;
-
-    const payload = { email: user.email, sub: user.id };
-    return {
-      access_token: this.jwtService.sign(payload),
-      user: result,
     };
   }
 
