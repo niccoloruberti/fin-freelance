@@ -1,217 +1,161 @@
-# FinFreelance Backend
+# FinFreelance — Backend
 
-Backend API costruito con NestJS, TypeORM e MySQL per la gestione contabile freelance.
+API REST costruita con NestJS + TypeORM + MySQL.
 
-## 🚀 Quick Start
-
-### 1. Installazione Dipendenze
+## Setup Locale
 
 ```bash
 npm install
-```
+cp .env.example .env   # configura DB, JWT, ecc.
 
-### 2. Configurazione Environment
+# Avvia MySQL e Redis con Docker (dalla root del progetto)
+cd .. && docker compose up -d && cd backend
 
-```bash
-cp .env.example .env
-# Modifica .env con le tue configurazioni
-```
-
-### 3. Avvio Database (Docker)
-
-```bash
-# Dalla root del progetto
-cd ..
-docker-compose up -d mysql
-```
-
-### 4. Esecuzione Migrazioni
-
-```bash
 npm run migration:run
+npm run start:dev      # http://localhost:3000/api/v1
 ```
 
-### 5. Avvio Server
+Swagger: http://localhost:3000/api/docs
 
-```bash
-# Development
-npm run start:dev
-
-# Production
-npm run build
-npm run start:prod
-```
-
-L'API sarà disponibile su `http://localhost:3000/api/v1`
-
-Documentazione Swagger: `http://localhost:3000/api/docs`
-
-## 📁 Struttura del Progetto
+## Struttura
 
 ```
-backend/
-├── src/
-│   ├── modules/          # Moduli funzionali
-│   │   ├── auth/         # Autenticazione JWT
-│   │   ├── users/        # Gestione utenti
-│   │   ├── transactions/ # Transazioni
-│   │   ├── categories/   # Categorie
-│   │   ├── clients/      # Clienti
-│   │   ├── tax/          # Calcoli fiscali
-│   │   ├── dashboard/    # Dashboard analytics
-│   │   └── recurring/    # Transazioni ricorrenti
-│   ├── common/           # Utilities comuni
-│   ├── config/           # Configurazioni
-│   ├── database/         # Migrations e seeds
-│   ├── app.module.ts     # Modulo principale
-│   └── main.ts           # Entry point
-├── test/                 # Test E2E
-├── .env.example          # Template variabili ambiente
-└── package.json
+src/
+├── modules/
+│   ├── auth/          # Login, register, JWT (passport-local + passport-jwt)
+│   ├── users/         # Profilo e dati fiscali utente
+│   ├── transactions/  # CRUD transazioni (entrate/uscite)
+│   ├── categories/    # CRUD categorie con flag isTaxable
+│   ├── clients/       # CRUD clienti
+│   ├── tax/           # Calcolo tasse (forfettario/ordinario, IRPEF, INPS)
+│   └── dashboard/     # Statistiche aggregate per la dashboard
+├── config/
+│   └── typeorm.config.ts
+├── database/
+│   ├── migrations/
+│   └── seeds/
+├── app.module.ts
+└── main.ts
 ```
 
-## 🔌 API Endpoints
+Ogni modulo segue il pattern: `module` → `controller` → `service` → `entities/` → `dto/`.
 
-### Authentication
+## Endpoint Principali
 
-- `POST /api/v1/auth/register` - Registrazione utente
-- `POST /api/v1/auth/login` - Login utente
-- `GET /api/v1/auth/profile` - Profilo utente (richiede JWT)
+### Auth
+```
+POST /api/v1/auth/register
+POST /api/v1/auth/login
+GET  /api/v1/auth/profile        # JWT richiesto
+```
 
 ### Users
-
-- `GET /api/v1/users` - Lista utenti
-- `GET /api/v1/users/:id` - Dettaglio utente
-- `PATCH /api/v1/users/:id` - Aggiorna utente
-- `DELETE /api/v1/users/:id` - Elimina utente
-
-### Transactions
-
-- `GET /api/v1/transactions` - Lista transazioni
-- `POST /api/v1/transactions` - Crea transazione
-- `GET /api/v1/transactions/:id` - Dettaglio transazione
-- `PATCH /api/v1/transactions/:id` - Aggiorna transazione
-- `DELETE /api/v1/transactions/:id` - Elimina transazione
-
-*Altri endpoint in sviluppo...*
-
-## 🗄️ Schema Database
-
-### Users
-- Informazioni utente
-- Regime fiscale (forfettario/ordinario)
-- Coefficienti fiscali personalizzabili
+```
+GET    /api/v1/users/:id
+PATCH  /api/v1/users/:id
+DELETE /api/v1/users/:id
+```
 
 ### Transactions
-- Entrate/Uscite
-- Collegamento a categoria e cliente
-- Supporto fatture e ricorrenze
+```
+GET    /api/v1/transactions       # supporta filtri: type, categoryId, clientId, dateFrom, dateTo
+POST   /api/v1/transactions
+GET    /api/v1/transactions/:id
+PATCH  /api/v1/transactions/:id
+DELETE /api/v1/transactions/:id
+```
 
 ### Categories
-- Categorie personalizzabili
-- Icone e colori
-- Categorie di sistema vs utente
+```
+GET    /api/v1/categories
+POST   /api/v1/categories
+PATCH  /api/v1/categories/:id
+DELETE /api/v1/categories/:id
+```
 
 ### Clients
-- Anagrafica clienti completa
-- P.IVA e Codice Fiscale
-- Storico transazioni
+```
+GET    /api/v1/clients
+POST   /api/v1/clients
+GET    /api/v1/clients/:id
+PATCH  /api/v1/clients/:id
+DELETE /api/v1/clients/:id
+```
 
-## 🧪 Testing
+### Tax
+```
+GET /api/v1/tax/summary?year=2024
+```
+
+### Dashboard
+```
+GET /api/v1/dashboard
+```
+
+Tutti gli endpoint (tranne register e login) richiedono `Authorization: Bearer <token>`.
+
+## Variabili d'Ambiente
+
+```env
+NODE_ENV=development
+PORT=3000
+
+DB_TYPE=mysql
+DB_HOST=localhost
+DB_PORT=3306
+DB_DATABASE=finfreelance
+DB_USERNAME=...
+DB_PASSWORD=...
+DB_SYNCHRONIZE=false
+DB_LOGGING=false
+
+JWT_SECRET=...
+JWT_EXPIRES_IN=7d
+JWT_REFRESH_SECRET=...
+
+CORS_ORIGIN=http://localhost:5173
+```
+
+## Migrazioni
 
 ```bash
-# Unit tests
-npm run test
-
-# E2E tests
-npm run test:e2e
-
-# Test coverage
-npm run test:cov
-```
-
-## 🔐 Autenticazione
-
-L'API utilizza JWT (JSON Web Tokens) per l'autenticazione.
-
-Header richiesto per endpoint protetti:
-```
-Authorization: Bearer <your-jwt-token>
-```
-
-## 📝 Migrazioni Database
-
-```bash
-# Genera nuova migration
-npm run migration:generate -- src/database/migrations/MigrationName
-
-# Esegui migrations
+# Esegui migrations pendenti
 npm run migration:run
+
+# Crea una nuova migration (dal diff entità)
+npm run migration:generate -- src/database/migrations/NomeMigrazione
 
 # Rollback ultima migration
 npm run migration:revert
+
+# In produzione (dentro il container Docker)
+docker exec finfreelance_backend npx typeorm migration:run -d dist/config/typeorm.config.js
 ```
 
-## 🌱 Seed Data
+## Seed
 
 ```bash
-npm run seed
+npm run seed    # crea categorie predefinite e utente di test
 ```
 
-Crea dati di esempio per lo sviluppo:
-- Utente di test
-- Categorie predefinite
-- Transazioni esempio
+## Convenzioni
 
-## 🚀 Deploy su Digital Ocean
+- Path alias: `@/` → `src/`, `@modules/`, `@config/`, `@common/`
+- PK: UUID su tutte le entità
+- Valori monetari: `decimal(10,2)`
+- Strict mode: OFF (`noImplicitAny: false`, `strictNullChecks: false`)
+- Validazione: `ValidationPipe` globale con `whitelist: true` e `forbidNonWhitelisted: true`
+- I DTO di update non devono includere `id`, `createdAt`, `updatedAt` (il frontend deve stripparli prima dell'invio)
 
-1. **Crea Droplet Ubuntu 22.04**
+## Deploy (produzione)
 
-2. **Installa Node.js e MySQL**
+Il backend gira in Docker. Per aggiornarlo:
+
 ```bash
-curl -fsSL https://deb.nodesource.com/setup_18.x | sudo -E bash -
-sudo apt-get install -y nodejs mysql-server
+git pull
+docker compose -f docker-compose.prod.yml build backend
+docker compose -f docker-compose.prod.yml up -d backend
+docker exec finfreelance_backend npx typeorm migration:run -d dist/config/typeorm.config.js
 ```
 
-3. **Clone e Build**
-```bash
-git clone <your-repo>
-cd finfreelance/backend
-npm install
-npm run build
-```
-
-4. **Configura PM2**
-```bash
-npm install -g pm2
-pm2 start dist/main.js --name finfreelance-api
-pm2 startup
-pm2 save
-```
-
-5. **Configura Nginx come reverse proxy**
-
-## 📚 Risorse
-
-- [NestJS Documentation](https://docs.nestjs.com)
-- [TypeORM Documentation](https://typeorm.io)
-- [MySQL Documentation](https://dev.mysql.com/doc)
-
-## 🐛 Troubleshooting
-
-### Errore connessione database
-- Verifica che MySQL sia in esecuzione
-- Controlla credenziali in `.env`
-- Verifica che il database esista
-
-### Errore JWT
-- Verifica `JWT_SECRET` in `.env`
-- Controlla scadenza token
-
-## 🤝 Contributi
-
-TODO: Aggiungi guidelines per contribuire
-
-## 📄 Licenza
-
-MIT
+Log: `docker logs finfreelance_backend -f`
