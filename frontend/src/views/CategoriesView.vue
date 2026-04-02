@@ -21,6 +21,11 @@ const columns: Column[] = [
   },
   { key: 'icon', label: 'Icona' },
   { key: 'color', label: 'Colore' },
+  {
+    key: 'isTaxable',
+    label: 'Imponibile',
+    format: (val: boolean) => val !== false ? 'Sì' : 'No',
+  },
 ]
 
 const EMOJI_LIST = [
@@ -52,6 +57,7 @@ const fields: FieldDef[] = [
   },
   { key: 'icon', label: 'Icona', type: 'emoji', emojiList: EMOJI_LIST },
   { key: 'color', label: 'Colore', type: 'color', palette: COLOR_PALETTE },
+  { key: 'isTaxable', label: 'Concorre al reddito imponibile', type: 'toggle' },
 ]
 
 async function fetchItems() {
@@ -82,7 +88,8 @@ async function handleSave(data: Record<string, any>) {
   error.value = null
   try {
     if (editingItem.value) {
-      await api.put(`/categories/${editingItem.value.id}`, data)
+      const { id, createdAt, updatedAt, ...payload } = data
+      await api.put(`/categories/${editingItem.value.id}`, payload)
     } else {
       await api.post('/categories', data)
     }

@@ -26,6 +26,9 @@ export class Category {
   @Column({ default: true })
   isDefault: boolean; // Categorie di sistema vs utente
 
+  @Column({ default: true })
+  isTaxable: boolean; // Se le transazioni in questa categoria concorrono al reddito imponibile
+
   @CreateDateColumn()
   createdAt: Date;
 

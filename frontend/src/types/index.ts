@@ -47,6 +47,7 @@ export interface Category {
   icon?: string
   color?: string
   isDefault: boolean
+  isTaxable: boolean
 }
 
 export type ClientStatus = 'lead' | 'active' | 'archived'

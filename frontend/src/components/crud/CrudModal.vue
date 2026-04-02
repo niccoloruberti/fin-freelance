@@ -4,7 +4,7 @@ import { ref, watch } from 'vue'
 export interface FieldDef {
   key: string
   label: string
-  type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'divider' | 'color' | 'emoji'
+  type: 'text' | 'email' | 'number' | 'date' | 'textarea' | 'select' | 'divider' | 'color' | 'emoji' | 'toggle'
   col?: 1 | 2
   required?: boolean
   options?: { value: string | number; label: string }[]
@@ -160,6 +160,28 @@ function colClass(field: FieldDef) {
                     <p v-if="form[field.key]" class="text-xs text-gray-400 mt-1">
                       Selezionato: {{ form[field.key] }}
                     </p>
+                  </div>
+
+                  <!-- Toggle (boolean) -->
+                  <div v-else-if="field.type === 'toggle'" class="flex items-center gap-3 mt-1">
+                    <button
+                      type="button"
+                      :class="[
+                        'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200',
+                        form[field.key] !== false ? 'bg-primary-600' : 'bg-gray-200',
+                      ]"
+                      @click="form[field.key] = form[field.key] === false ? true : false"
+                    >
+                      <span
+                        :class="[
+                          'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200',
+                          form[field.key] !== false ? 'translate-x-5' : 'translate-x-0',
+                        ]"
+                      />
+                    </button>
+                    <span class="text-sm text-gray-600">
+                      {{ form[field.key] !== false ? 'Sì' : 'No' }}
+                    </span>
                   </div>
 
                   <input

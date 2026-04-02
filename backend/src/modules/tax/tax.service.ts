@@ -48,18 +48,20 @@ export class TaxService {
     const [transactions, prevTransactions] = await Promise.all([
       this.transactionRepository
         .createQueryBuilder('t')
+        .leftJoinAndSelect('t.category', 'category')
         .where('t.userId = :userId', { userId })
         .andWhere('YEAR(t.date) = :year', { year })
         .getMany(),
       this.transactionRepository
         .createQueryBuilder('t')
+        .leftJoinAndSelect('t.category', 'category')
         .where('t.userId = :userId', { userId })
         .andWhere('YEAR(t.date) = :year', { year: year - 1 })
         .getMany(),
     ]);
 
     const totalIncome = transactions
-      .filter((t) => t.type === 'income')
+      .filter((t) => t.type === 'income' && (t.category === null || t.category.isTaxable !== false))
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     const totalExpenses = transactions
@@ -74,7 +76,7 @@ export class TaxService {
 
     // Metodo storico: usa le tasse dell'anno precedente se disponibili
     const prevIncome = prevTransactions
-      .filter((t) => t.type === 'income')
+      .filter((t) => t.type === 'income' && (t.category === null || t.category.isTaxable !== false))
       .reduce((sum, t) => sum + Number(t.amount), 0);
 
     let accontiMethod: 'storico' | 'previsionale';
