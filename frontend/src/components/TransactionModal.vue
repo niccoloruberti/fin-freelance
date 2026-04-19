@@ -46,6 +46,22 @@ const filteredClients = computed(() => {
   return props.clients.filter(c => c.name.toLowerCase().includes(q))
 })
 
+// Category combobox
+const categoryQuery = ref('')
+const selectedCategory = computed({
+  get: () => props.categories.find(c => c.id === form.value.categoryId) ?? null,
+  set: (cat: Category | null) => { form.value.categoryId = cat?.id ?? '' },
+})
+function categoryDisplayValue(c: unknown) {
+  return (c as Category | null)?.name ?? ''
+}
+const filteredCategoriesByQuery = computed(() => {
+  const byType = filteredCategories.value
+  if (!categoryQuery.value) return byType
+  const q = categoryQuery.value.toLowerCase()
+  return byType.filter(c => c.name.toLowerCase().includes(q))
+})
+
 watch(
   () => props.show,
   (val) => {
@@ -261,12 +277,44 @@ const isEditing = computed(() => !!props.initialData)
               </div>
               <div>
                 <label class="block text-sm font-medium text-gray-700 mb-1">Categoria</label>
-                <select v-model="form.categoryId" class="input">
-                  <option value="">Nessuna categoria</option>
-                  <option v-for="cat in filteredCategories" :key="cat.id" :value="cat.id">
-                    {{ cat.name }}
-                  </option>
-                </select>
+                <Combobox v-model="selectedCategory" nullable>
+                  <div class="relative">
+                    <ComboboxInput
+                      class="input pr-8"
+                      :displayValue="categoryDisplayValue"
+                      placeholder="Cerca categoria..."
+                      @change="categoryQuery = $event.target.value"
+                    />
+                    <ComboboxButton class="absolute inset-y-0 right-0 flex items-center pr-2">
+                      <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                      </svg>
+                    </ComboboxButton>
+                    <ComboboxOptions class="absolute z-10 mt-1 max-h-48 w-full overflow-auto rounded-lg bg-white py-1 shadow-lg ring-1 ring-black/5 text-sm">
+                      <ComboboxOption :value="null" v-slot="{ active }">
+                        <div :class="['px-3 py-2 cursor-pointer text-gray-500 italic', active ? 'bg-primary-50' : '']">
+                          Nessuna categoria
+                        </div>
+                      </ComboboxOption>
+                      <ComboboxOption
+                        v-for="cat in filteredCategoriesByQuery"
+                        :key="cat.id"
+                        :value="cat"
+                        v-slot="{ active, selected }"
+                      >
+                        <div :class="['px-3 py-2 cursor-pointer flex items-center justify-between', active ? 'bg-primary-50 text-primary-700' : 'text-gray-900']">
+                          <span>{{ cat.name }}</span>
+                          <svg v-if="selected" class="w-4 h-4 text-primary-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                          </svg>
+                        </div>
+                      </ComboboxOption>
+                      <div v-if="filteredCategoriesByQuery.length === 0" class="px-3 py-2 text-gray-400 italic">
+                        Nessun risultato
+                      </div>
+                    </ComboboxOptions>
+                  </div>
+                </Combobox>
               </div>
 
               <!-- Invoice number (full width) -->
