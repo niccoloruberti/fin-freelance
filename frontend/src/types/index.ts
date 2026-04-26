@@ -31,6 +31,29 @@ export interface Transaction {
   date: string
   invoiceNumber?: string
   isRecurring: boolean
+  recurringTransactionId?: string
+  userId: string
+  categoryId?: string
+  clientId?: string
+  category?: Category
+  client?: Client
+  createdAt: string
+  updatedAt: string
+}
+
+export type RecurringFrequency = 'daily' | 'weekly' | 'monthly' | 'yearly'
+
+export interface RecurringTransaction {
+  id: string
+  type: 'income' | 'expense'
+  amount: number
+  description: string
+  frequency: RecurringFrequency
+  dayOfPeriod?: number
+  startDate: string
+  endDate?: string
+  active: boolean
+  lastGeneratedDate?: string
   userId: string
   categoryId?: string
   clientId?: string

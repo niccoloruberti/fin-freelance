@@ -8,9 +8,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 
-
-@Entity('transactions')
-export class Transaction {
+@Entity('recurring_transactions')
+export class RecurringTransaction {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
@@ -23,23 +22,25 @@ export class Transaction {
   @Column()
   description: string;
 
+  @Column({ type: 'enum', enum: ['daily', 'weekly', 'monthly', 'yearly'], default: 'monthly' })
+  frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+
+  @Column({ type: 'int', nullable: true, comment: '1-28 for monthly, 1-7 for weekly' })
+  dayOfPeriod: number;
+
   @Column({ type: 'date' })
-  date: Date;
+  startDate: Date;
 
-  @Column({ nullable: true })
-  invoiceNumber: string;
+  @Column({ type: 'date', nullable: true })
+  endDate: Date;
 
-  @Column({ type: 'boolean', default: false })
-  isRecurring: boolean;
+  @Column({ type: 'boolean', default: true })
+  active: boolean;
 
-  @ManyToOne('RecurringTransaction', { nullable: true, onDelete: 'SET NULL' })
-  @JoinColumn({ name: 'recurringTransactionId' })
-  recurringTransaction: any;
+  @Column({ type: 'date', nullable: true })
+  lastGeneratedDate: Date;
 
-  @Column({ nullable: true })
-  recurringTransactionId: string;
-
-  @ManyToOne('User', (user: any) => user.transactions, { onDelete: 'CASCADE' })
+  @ManyToOne('User', { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: any;
 

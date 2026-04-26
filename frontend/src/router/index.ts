@@ -40,6 +40,11 @@ const router = createRouter({
           component: () => import('@/views/CategoriesView.vue')
         },
         {
+          path: 'recurring',
+          name: 'recurring',
+          component: () => import('@/views/RecurringView.vue')
+        },
+        {
           path: 'tax-summary',
           name: 'tax-summary',
           component: () => import('@/views/TaxSummaryView.vue')

@@ -9,6 +9,7 @@ const route = useRoute()
 const navItems = [
   { name: 'Dashboard', path: '/dashboard', icon: 'grid' },
   { name: 'Transazioni', path: '/transactions', icon: 'arrows' },
+  { name: 'Ricorrenti', path: '/recurring', icon: 'refresh' },
   { name: 'Clienti', path: '/clients', icon: 'users' },
   { name: 'Categorie', path: '/categories', icon: 'tag' },
   { name: 'Riepilogo Tasse', path: '/tax-summary', icon: 'calculator' },
@@ -55,6 +56,10 @@ function isActive(path: string) {
           <!-- tag -->
           <svg v-if="item.icon === 'tag'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-5 5a2 2 0 01-2.828 0l-7-7A2 2 0 013 9V4a1 1 0 011-1z" />
+          </svg>
+          <!-- refresh -->
+          <svg v-if="item.icon === 'refresh'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           <!-- calculator -->
           <svg v-if="item.icon === 'calculator'" class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
