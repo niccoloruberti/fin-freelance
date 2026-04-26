@@ -24,6 +24,7 @@ const form = ref({
   categoryId: '',
   clientId: '',
   invoiceNumber: '',
+  isTaxable: true,
 })
 
 const filteredCategories = computed(() =>
@@ -75,6 +76,7 @@ watch(
         categoryId: props.initialData.categoryId ?? '',
         clientId: props.initialData.clientId ?? '',
         invoiceNumber: props.initialData.invoiceNumber ?? '',
+        isTaxable: props.initialData.isTaxable ?? true,
       }
     } else {
       form.value = {
@@ -85,6 +87,7 @@ watch(
         categoryId: '',
         clientId: '',
         invoiceNumber: '',
+        isTaxable: true,
       }
     }
   },
@@ -110,6 +113,7 @@ function handleSubmit() {
     amount: Number(form.value.amount),
     description: form.value.description,
     date: form.value.date,
+    isTaxable: form.value.isTaxable,
   }
   if (form.value.categoryId) data.categoryId = form.value.categoryId
   if (form.value.clientId) data.clientId = form.value.clientId
@@ -326,6 +330,26 @@ const isEditing = computed(() => !!props.initialData)
                   placeholder="Es. FT-2024-001"
                   class="input"
                 />
+              </div>
+
+              <!-- isTaxable toggle (full width) -->
+              <div class="col-span-2 flex items-center gap-3">
+                <button
+                  type="button"
+                  :class="[
+                    'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200',
+                    form.isTaxable ? 'bg-primary-600' : 'bg-gray-200',
+                  ]"
+                  @click="form.isTaxable = !form.isTaxable"
+                >
+                  <span
+                    :class="[
+                      'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200',
+                      form.isTaxable ? 'translate-x-5' : 'translate-x-0',
+                    ]"
+                  />
+                </button>
+                <span class="text-sm text-gray-700">Concorre al reddito imponibile</span>
               </div>
 
             </div>

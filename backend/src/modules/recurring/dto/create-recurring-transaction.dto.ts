@@ -51,6 +51,11 @@ export class CreateRecurringTransactionDto {
   @IsBoolean()
   active?: boolean;
 
+  @ApiPropertyOptional({ default: true, description: 'Se le transazioni generate concorrono al reddito imponibile' })
+  @IsOptional()
+  @IsBoolean()
+  isTaxable?: boolean;
+
   @ApiPropertyOptional()
   @IsOptional()
   @IsUUID()

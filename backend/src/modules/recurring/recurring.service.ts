@@ -89,6 +89,7 @@ export class RecurringService {
           description: recurring.description,
           date: format(current, 'yyyy-MM-dd') as any,
           isRecurring: true,
+          isTaxable: recurring.isTaxable,
           recurringTransactionId: recurring.id,
           categoryId: recurring.categoryId,
           clientId: recurring.clientId,

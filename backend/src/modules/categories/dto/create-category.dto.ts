@@ -25,8 +25,4 @@ export class CreateCategoryDto {
   @IsOptional()
   isDefault?: boolean;
 
-  @ApiPropertyOptional({ default: true, description: 'Se le transazioni in questa categoria concorrono al reddito imponibile' })
-  @IsBoolean()
-  @IsOptional()
-  isTaxable?: boolean;
 }

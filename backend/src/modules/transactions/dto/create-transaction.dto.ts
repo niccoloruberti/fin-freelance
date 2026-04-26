@@ -38,6 +38,11 @@ export class CreateTransactionDto {
   @IsBoolean()
   isRecurring?: boolean;
 
+  @ApiPropertyOptional({ default: true, description: 'Se la transazione concorre al reddito imponibile' })
+  @IsOptional()
+  @IsBoolean()
+  isTaxable?: boolean;
+
   @ApiPropertyOptional({ example: 'uuid-of-category' })
   @IsOptional()
   @IsUUID()

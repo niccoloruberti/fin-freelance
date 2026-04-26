@@ -37,6 +37,9 @@ export class RecurringTransaction {
   @Column({ type: 'boolean', default: true })
   active: boolean;
 
+  @Column({ type: 'boolean', default: true })
+  isTaxable: boolean;
+
   @Column({ type: 'date', nullable: true })
   lastGeneratedDate: Date;
 

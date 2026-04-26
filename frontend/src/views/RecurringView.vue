@@ -68,6 +68,7 @@ const form = ref({
   startDate: '',
   endDate: '',
   active: true,
+  isTaxable: true,
   categoryId: '',
   clientId: '',
 })
@@ -123,6 +124,7 @@ function resetForm() {
     startDate: new Date().toISOString().slice(0, 10),
     endDate: '',
     active: true,
+    isTaxable: true,
     categoryId: '',
     clientId: '',
   }
@@ -147,6 +149,7 @@ function openEdit(item: Record<string, any>) {
     startDate: item.startDate,
     endDate: item.endDate ?? '',
     active: item.active,
+    isTaxable: item.isTaxable ?? true,
     categoryId: item.categoryId ?? '',
     clientId: item.clientId ?? '',
   }
@@ -171,6 +174,7 @@ async function handleSave() {
       frequency: form.value.frequency,
       startDate: form.value.startDate,
       active: form.value.active,
+      isTaxable: form.value.isTaxable,
     }
     if (form.value.dayOfPeriod) payload.dayOfPeriod = form.value.dayOfPeriod
     if (form.value.endDate) payload.endDate = form.value.endDate
@@ -540,6 +544,26 @@ onMounted(() => {
                     />
                   </button>
                   <span class="text-sm text-gray-700">Template attivo</span>
+                </div>
+
+                <!-- isTaxable toggle -->
+                <div class="col-span-2 flex items-center gap-3">
+                  <button
+                    type="button"
+                    :class="[
+                      'relative inline-flex h-6 w-11 flex-shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200',
+                      form.isTaxable ? 'bg-primary-600' : 'bg-gray-200',
+                    ]"
+                    @click="form.isTaxable = !form.isTaxable"
+                  >
+                    <span
+                      :class="[
+                        'inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200',
+                        form.isTaxable ? 'translate-x-5' : 'translate-x-0',
+                      ]"
+                    />
+                  </button>
+                  <span class="text-sm text-gray-700">Concorre al reddito imponibile</span>
                 </div>
 
               </div>

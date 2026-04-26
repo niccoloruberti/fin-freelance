@@ -31,6 +31,7 @@ export interface Transaction {
   date: string
   invoiceNumber?: string
   isRecurring: boolean
+  isTaxable: boolean
   recurringTransactionId?: string
   userId: string
   categoryId?: string
@@ -53,6 +54,7 @@ export interface RecurringTransaction {
   startDate: string
   endDate?: string
   active: boolean
+  isTaxable: boolean
   lastGeneratedDate?: string
   userId: string
   categoryId?: string
@@ -70,7 +72,6 @@ export interface Category {
   icon?: string
   color?: string
   isDefault: boolean
-  isTaxable: boolean
 }
 
 export type ClientStatus = 'lead' | 'active' | 'archived'

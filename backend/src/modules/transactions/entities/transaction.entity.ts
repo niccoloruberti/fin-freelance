@@ -32,6 +32,9 @@ export class Transaction {
   @Column({ type: 'boolean', default: false })
   isRecurring: boolean;
 
+  @Column({ type: 'boolean', default: true })
+  isTaxable: boolean;
+
   @ManyToOne('RecurringTransaction', { nullable: true, onDelete: 'SET NULL' })
   @JoinColumn({ name: 'recurringTransactionId' })
   recurringTransaction: any;
