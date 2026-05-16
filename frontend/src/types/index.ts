@@ -74,7 +74,16 @@ export interface Category {
   isDefault: boolean
 }
 
-export type ClientStatus = 'lead' | 'active' | 'archived'
+export type ClientStatus = 'lead' | 'active' | 'attesa' | 'prenotazione' | 'finalizzato' | 'perso' | 'archived'
+export type LookupType = 'source' | 'service'
+
+export interface ClientLookup {
+  id: string
+  name: string
+  type: LookupType
+  userId: string
+  createdAt: string
+}
 
 export interface Client {
   id: string
@@ -88,6 +97,11 @@ export interface Client {
   postalCode?: string
   country?: string
   notes?: string
+  source?: string
+  service?: string
+  contactDate?: string
+  lastContactDate?: string
+  birthDate?: string
   status: ClientStatus
   userId: string
 }

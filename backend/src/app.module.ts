@@ -10,6 +10,7 @@ import { ClientsModule } from './modules/clients/clients.module';
 import { TaxModule } from './modules/tax/tax.module';
 import { RecurringModule } from './modules/recurring/recurring.module';
 import { DashboardModule } from './modules/dashboard/dashboard.module';
+import { ClientLookupsModule } from './modules/client-lookups/client-lookups.module';
 
 @Module({
   imports: [
@@ -52,6 +53,7 @@ import { DashboardModule } from './modules/dashboard/dashboard.module';
     TaxModule,
     RecurringModule,
     DashboardModule,
+    ClientLookupsModule,
   ],
 })
 export class AppModule {}

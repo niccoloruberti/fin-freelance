@@ -11,6 +11,10 @@ import {
 export enum ClientStatus {
   LEAD = 'lead',
   ACTIVE = 'active',
+  WAITING = 'attesa',
+  BOOKING = 'prenotazione',
+  FINALIZED = 'finalizzato',
+  LOST = 'perso',
   ARCHIVED = 'archived',
 }
 
@@ -48,6 +52,21 @@ export class Client {
 
   @Column({ type: 'text', nullable: true })
   notes: string;
+
+  @Column({ nullable: true })
+  source: string;
+
+  @Column({ nullable: true })
+  service: string;
+
+  @Column({ type: 'date', nullable: true })
+  contactDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  lastContactDate: Date;
+
+  @Column({ type: 'date', nullable: true })
+  birthDate: Date;
 
   @Column({ type: 'enum', enum: ClientStatus, default: ClientStatus.ACTIVE })
   status: ClientStatus;
