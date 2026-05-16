@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import CrudTable, { type Column } from '@/components/crud/CrudTable.vue'
 import CrudModal, { type FieldDef } from '@/components/crud/CrudModal.vue'
 import api from '@/services/api'
@@ -11,6 +11,24 @@ const saving = ref(false)
 const modalOpen = ref(false)
 const editingItem = ref<Category | null>(null)
 const error = ref<string | null>(null)
+
+const searchQuery = ref('')
+const filterType = ref<'all' | 'income' | 'expense' | 'both'>('all')
+
+const TYPE_OPTIONS = [
+  { value: 'all', label: 'Tutti' },
+  { value: 'income', label: 'Entrate' },
+  { value: 'expense', label: 'Uscite' },
+  { value: 'both', label: 'Entrambi' },
+] as const
+
+const filteredItems = computed(() => {
+  return items.value.filter(cat => {
+    if (filterType.value !== 'all' && cat.type !== filterType.value) return false
+    if (searchQuery.value && !cat.name?.toLowerCase().includes(searchQuery.value.toLowerCase())) return false
+    return true
+  })
+})
 
 const columns: Column[] = [
   { key: 'name', label: 'Nome' },
@@ -126,10 +144,31 @@ onMounted(fetchItems)
       {{ error }}
     </div>
 
+    <!-- Filtri -->
+    <div class="mb-4 flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
+      <div class="relative flex-1 min-w-0">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input v-model="searchQuery" type="text" placeholder="Cerca..."
+          class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" />
+      </div>
+
+      <div class="flex rounded-md bg-gray-100 p-0.5 gap-0.5 shrink-0">
+        <button
+          v-for="t in TYPE_OPTIONS"
+          :key="t.value"
+          @click="filterType = t.value"
+          class="px-2.5 py-1 text-xs font-medium rounded transition-all whitespace-nowrap"
+          :class="filterType === t.value ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+        >{{ t.label }}</button>
+      </div>
+    </div>
+
     <div class="card p-0 overflow-hidden">
       <CrudTable
         :columns="columns"
-        :items="items"
+        :items="filteredItems"
         :loading="loading"
         empty-message="Nessuna categoria ancora. Creane una!"
         @edit="openEdit"

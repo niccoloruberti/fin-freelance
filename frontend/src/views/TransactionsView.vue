@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, computed, onMounted } from 'vue'
 import CrudTable, { type Column } from '@/components/crud/CrudTable.vue'
 import TransactionModal from '@/components/TransactionModal.vue'
 import api from '@/services/api'
@@ -13,6 +13,47 @@ const saving = ref(false)
 const modalOpen = ref(false)
 const editingItem = ref<Transaction | null>(null)
 const error = ref<string | null>(null)
+
+const searchQuery = ref('')
+const filterType = ref<'all' | 'income' | 'expense'>('all')
+const filterDateFrom = ref('')
+const filterDateTo = ref('')
+const filterCategoryId = ref('')
+const filterClientId = ref('')
+
+const filteredTransactions = computed(() => {
+  return transactions.value.filter(tx => {
+    if (filterType.value !== 'all' && tx.type !== filterType.value) return false
+    if (searchQuery.value) {
+      const q = searchQuery.value.toLowerCase()
+      if (!tx.description?.toLowerCase().includes(q) && !tx.invoiceNumber?.toLowerCase().includes(q)) return false
+    }
+    if (filterDateFrom.value && tx.date.slice(0, 10) < filterDateFrom.value) return false
+    if (filterDateTo.value && tx.date.slice(0, 10) > filterDateTo.value) return false
+    if (filterCategoryId.value && tx.categoryId !== filterCategoryId.value) return false
+    if (filterClientId.value && tx.clientId !== filterClientId.value) return false
+    return true
+  })
+})
+
+const hasActiveFilters = computed(() =>
+  searchQuery.value || filterType.value !== 'all' || filterDateFrom.value || filterDateTo.value || filterCategoryId.value || filterClientId.value
+)
+
+function resetFilters() {
+  searchQuery.value = ''
+  filterType.value = 'all'
+  filterDateFrom.value = ''
+  filterDateTo.value = ''
+  filterCategoryId.value = ''
+  filterClientId.value = ''
+}
+
+const TYPE_OPTIONS = [
+  { value: 'all', label: 'Tutti' },
+  { value: 'income', label: 'Entrate' },
+  { value: 'expense', label: 'Uscite' },
+] as const
 
 const columns: Column[] = [
   {
@@ -142,10 +183,61 @@ onMounted(() => {
       {{ error }}
     </div>
 
+    <!-- Filtri -->
+    <div class="mb-4 flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
+      <div class="relative flex-1 min-w-0">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input v-model="searchQuery" type="text" placeholder="Cerca..."
+          class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" />
+      </div>
+
+      <div class="flex rounded-md bg-gray-100 p-0.5 gap-0.5 shrink-0">
+        <button
+          v-for="t in TYPE_OPTIONS"
+          :key="t.value"
+          @click="filterType = t.value"
+          class="px-2.5 py-1 text-xs font-medium rounded transition-all whitespace-nowrap"
+          :class="filterType === t.value ? 'bg-white shadow-sm text-gray-900' : 'text-gray-500 hover:text-gray-700'"
+        >{{ t.label }}</button>
+      </div>
+
+      <div class="flex items-center gap-1 shrink-0">
+        <span class="text-xs text-gray-400">Dal</span>
+        <input v-model="filterDateFrom" type="date"
+          class="w-[128px] px-2 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" />
+        <span class="text-xs text-gray-400">Al</span>
+        <input v-model="filterDateTo" type="date"
+          class="w-[128px] px-2 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" />
+      </div>
+
+      <select v-model="filterCategoryId"
+        class="shrink-0 px-2 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 max-w-[140px]">
+        <option value="">Categoria</option>
+        <option v-for="c in categories" :key="c.id" :value="c.id">{{ c.name }}</option>
+      </select>
+
+      <select v-model="filterClientId"
+        class="shrink-0 px-2 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500 max-w-[140px]">
+        <option value="">Cliente</option>
+        <option v-for="c in clients" :key="c.id" :value="c.id">{{ c.name }}</option>
+      </select>
+
+      <template v-if="hasActiveFilters">
+        <button @click="resetFilters" class="shrink-0 p-1 text-gray-400 hover:text-gray-600 rounded transition-colors" title="Azzera filtri">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+        <span class="shrink-0 text-xs text-gray-400 whitespace-nowrap">{{ filteredTransactions.length }}</span>
+      </template>
+    </div>
+
     <div class="card p-0 overflow-hidden">
       <CrudTable
         :columns="columns"
-        :items="transactions"
+        :items="filteredTransactions"
         :loading="loading"
         empty-message="Nessuna transazione ancora. Creane una!"
         @edit="openEdit"

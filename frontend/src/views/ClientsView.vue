@@ -12,6 +12,7 @@ const modalOpen = ref(false)
 const editingItem = ref<Client | null>(null)
 const error = ref<string | null>(null)
 const activeFilter = ref<ClientStatus | 'all'>('all')
+const searchQuery = ref('')
 
 // Lookup: fonti e servizi
 const sources = ref<ClientLookup[]>([])
@@ -79,11 +80,20 @@ const FILTER_TABS: { value: ClientStatus | 'all'; label: string }[] = [
   { value: 'archived',     label: 'Archiviati' },
 ]
 
-const filteredItems = computed(() =>
-  activeFilter.value === 'all'
+const filteredItems = computed(() => {
+  let result = activeFilter.value === 'all'
     ? items.value
-    : items.value.filter((c) => c.status === activeFilter.value),
-)
+    : items.value.filter(c => c.status === activeFilter.value)
+  if (searchQuery.value) {
+    const q = searchQuery.value.toLowerCase()
+    result = result.filter(c =>
+      c.name?.toLowerCase().includes(q) ||
+      c.email?.toLowerCase().includes(q) ||
+      c.city?.toLowerCase().includes(q)
+    )
+  }
+  return result
+})
 
 const columns: Column[] = [
   { key: 'name',         label: 'Nome' },
@@ -267,6 +277,17 @@ onMounted(() => { fetchItems(); fetchLookups() })
             <button @click="addLookup('service')" class="btn btn-primary text-sm px-3">+</button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- Ricerca -->
+    <div class="mb-3 flex items-center gap-2 bg-white border border-gray-200 rounded-lg px-3 py-2">
+      <div class="relative flex-1 min-w-0">
+        <svg class="absolute left-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+        </svg>
+        <input v-model="searchQuery" type="text" placeholder="Cerca per nome, email, città..."
+          class="w-full pl-8 pr-3 py-1.5 text-sm border border-gray-200 rounded-md focus:outline-none focus:ring-2 focus:ring-primary-500" />
       </div>
     </div>
 
