@@ -26,9 +26,6 @@ export class Transaction {
   @Column({ type: 'date' })
   date: Date;
 
-  @Column({ nullable: true })
-  invoiceNumber: string;
-
   @Column({ type: 'boolean', default: false })
   isRecurring: boolean;
 

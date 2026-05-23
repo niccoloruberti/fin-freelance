@@ -29,7 +29,6 @@ export interface Transaction {
   amount: number
   description: string
   date: string
-  invoiceNumber?: string
   isRecurring: boolean
   isTaxable: boolean
   recurringTransactionId?: string

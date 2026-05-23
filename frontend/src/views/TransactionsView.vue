@@ -26,7 +26,7 @@ const filteredTransactions = computed(() => {
     if (filterType.value !== 'all' && tx.type !== filterType.value) return false
     if (searchQuery.value) {
       const q = searchQuery.value.toLowerCase()
-      if (!tx.description?.toLowerCase().includes(q) && !tx.invoiceNumber?.toLowerCase().includes(q)) return false
+      if (!tx.description?.toLowerCase().includes(q)) return false
     }
     if (filterDateFrom.value && tx.date.slice(0, 10) < filterDateFrom.value) return false
     if (filterDateTo.value && tx.date.slice(0, 10) > filterDateTo.value) return false

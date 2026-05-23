@@ -23,7 +23,6 @@ const form = ref({
   date: '',
   categoryId: '',
   clientId: '',
-  invoiceNumber: '',
   isTaxable: true,
 })
 
@@ -75,7 +74,6 @@ watch(
         date: props.initialData.date,
         categoryId: props.initialData.categoryId ?? '',
         clientId: props.initialData.clientId ?? '',
-        invoiceNumber: props.initialData.invoiceNumber ?? '',
         isTaxable: props.initialData.isTaxable ?? true,
       }
     } else {
@@ -86,7 +84,6 @@ watch(
         date: new Date().toISOString().slice(0, 10),
         categoryId: '',
         clientId: '',
-        invoiceNumber: '',
         isTaxable: true,
       }
     }
@@ -117,7 +114,6 @@ function handleSubmit() {
   }
   if (form.value.categoryId) data.categoryId = form.value.categoryId
   if (form.value.clientId) data.clientId = form.value.clientId
-  if (form.value.invoiceNumber) data.invoiceNumber = form.value.invoiceNumber
   emit('save', data)
 }
 
@@ -319,17 +315,6 @@ const isEditing = computed(() => !!props.initialData)
                     </ComboboxOptions>
                   </div>
                 </Combobox>
-              </div>
-
-              <!-- Invoice number (full width) -->
-              <div class="col-span-2">
-                <label class="block text-sm font-medium text-gray-700 mb-1">Numero fattura</label>
-                <input
-                  v-model="form.invoiceNumber"
-                  type="text"
-                  placeholder="Es. FT-2024-001"
-                  class="input"
-                />
               </div>
 
               <!-- isTaxable toggle (full width) -->

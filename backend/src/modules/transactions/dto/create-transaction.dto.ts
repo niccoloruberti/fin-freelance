@@ -28,11 +28,6 @@ export class CreateTransactionDto {
   @IsDateString()
   date: string;
 
-  @ApiPropertyOptional({ example: 'FT-2024-001' })
-  @IsOptional()
-  @IsString()
-  invoiceNumber?: string;
-
   @ApiPropertyOptional({ default: false })
   @IsOptional()
   @IsBoolean()
