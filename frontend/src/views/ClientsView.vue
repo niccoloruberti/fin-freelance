@@ -173,7 +173,7 @@ async function handleSave(data: Record<string, any>) {
   try {
     if (editingItem.value) {
       const { id, createdAt, updatedAt, ...payload } = data
-      await api.put(`/clients/${editingItem.value.id}`, payload)
+      await api.patch(`/clients/${editingItem.value.id}`, payload)
     } else {
       await api.post('/clients', data)
     }
