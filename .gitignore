@@ -50,3 +50,6 @@ Thumbs.db
 
 # Build files
 *.tsbuildinfo
+
+#other files
+psw.rtf
